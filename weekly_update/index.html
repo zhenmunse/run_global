@@ -523,7 +523,8 @@
               <div class="spinner"></div>
               <p>正在加载期刊内容...</p>
             </div>
-            <iframe id="issueFrame" class="issue-frame" frameborder="0"></iframe>
+            <!-- 渲染容器：使用前端 fetch + marked 渲染 Markdown 内容，避免 iframe 嵌入被 github.com 阻止 -->
+            <div id="issueContent" class="issue-content"></div>
           </div>
         </div>
       </div>
@@ -534,6 +535,10 @@
     </footer>
   </div>
 
+  <script>
+    // 引入 marked（用于 Markdown 到 HTML 渲染）
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
     // 常用Markdown渲染器配置
     const RENDERERS = [
@@ -722,7 +727,7 @@
       return null;
     }
 
-    // 加载文件到 iframe（使用 CDN 优先、RAW 回退策略）
+    // 加载文件并在页面内渲染 Markdown（优先 CDN，回退 RAW）
     async function loadFile(file) {
       currentFile = file;
 
@@ -739,9 +744,8 @@
       }
 
       showLoading();
-
-      const iframe = document.getElementById('issueFrame');
-      if (!iframe) {
+      const contentEl = document.getElementById('issueContent');
+      if (!contentEl) {
         hideLoading();
         return;
       }
@@ -749,38 +753,32 @@
       // 选择合适的源（cdn/raw）
       const chosen = await chooseSourceUrl(file.filename);
 
-      try {
-        if (chosen) {
-          // 如果当前渲染器是 StackEdit 或 Dillinger，则把选中的原始 URL 包装到它们的在线渲染器中
-          if (currentRenderer && currentRenderer.name === 'StackEdit') {
-            iframe.src = `https://stackedit.io/app#url=${encodeURIComponent(chosen.url)}`;
-          } else if (currentRenderer && currentRenderer.name === 'Dillinger') {
-            iframe.src = `https://dillinger.io/?url=${encodeURIComponent(chosen.url)}`;
-          } else {
-            // 否则直接使用选中的 URL（CDN 或 RAW）。注意：直接加载 raw/ CDN 的 Markdown 会在 iframe 中以纯文本形式显示，
-            // 如果需要渲染为漂亮的 HTML，建议选择 StackEdit/Dillinger 作为渲染器。
-            iframe.src = chosen.url;
-          }
-
-          iframe.onload = hideLoading;
-          iframe.onerror = () => {
-            hideLoading();
-            showError('加载失败（iframe 加载出错），请稍后重试');
-          };
-        } else {
-          // 两者都不可用：回退到渲染器提供的 URL（例如 GitHub blob，注意可能会被浏览器阻止嵌入）
-          const fallbackUrl = currentRenderer.getUrl(file.filename);
-          iframe.src = fallbackUrl;
-          iframe.onload = hideLoading;
-          iframe.onerror = () => {
-            hideLoading();
-            showError('无法从 CDN 或 RAW 获取文件，且渲染器回退失败');
-          };
-        }
-      } catch (err) {
-        console.error('加载文件时出错:', err);
+      if (!chosen) {
         hideLoading();
-        showError('加载时发生异常，请检查控制台');
+        showError('无法从 CDN 或 RAW 获取文件，请稍后重试');
+        return;
+      }
+
+      try {
+        const resp = await fetch(chosen.url);
+        if (!resp.ok) {
+          throw new Error(`Fetch failed: ${resp.status}`);
+        }
+        const md = await resp.text();
+
+        // 使用 marked 渲染（如果 marked 未加载，则显示原始文本）
+        if (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') {
+          contentEl.innerHTML = marked.parse(md);
+        } else {
+          contentEl.textContent = md;
+        }
+
+        // 简单地移除 loading
+        hideLoading();
+      } catch (err) {
+        console.error('加载或渲染 Markdown 失败:', err);
+        hideLoading();
+        showError('加载或渲染失败，请检查控制台');
       }
 
       // 更新选择框状态
