@@ -509,6 +509,12 @@
           </div>
         </div>
 
+        <!-- 渲染器选择（Marked / StackEdit / Dillinger 等） -->
+        <div class="renderer-selector">
+          <h3>渲染器</h3>
+          <div id="rendererButtons" class="renderer-buttons" aria-label="渲染器选择"></div>
+        </div>
+
         <!-- 当前显示的期刊 -->
         <div class="current-issue">
           <div class="current-issue-header">
@@ -525,6 +531,8 @@
             </div>
             <!-- 渲染容器：使用前端 fetch + marked 渲染 Markdown 内容，避免 iframe 嵌入被 github.com 阻止 -->
             <div id="issueContent" class="issue-content"></div>
+            <!-- 外部渲染器 iframe：仅在选择外部渲染器时显示 -->
+            <iframe id="issueFrame" class="issue-frame" frameborder="0" style="display:none"></iframe>
           </div>
         </div>
       </div>
@@ -543,19 +551,14 @@
     // 常用Markdown渲染器配置
     const RENDERERS = [
       {
-        name: 'GitHub',
-        description: '使用GitHub渲染器（推荐）',
+        name: 'Marked',
+        description: '页面内使用 marked.js 渲染（快速、离线优先）',
         default: true,
-        getUrl: (filename) => `https://github.com/zhenmunse/run_global/blob/main/weekly_update/storage/${filename}`
-      },
-      {
-        name: 'GitLab',
-        description: '使用GitLab渲染器',
-        getUrl: (filename) => `https://gitlab.com/zhenmunse/run_global/-/blob/main/weekly_update/storage/${filename}`
+        getUrl: (filename) => null
       },
       {
         name: 'StackEdit',
-        description: '使用StackEdit在线编辑器',
+        description: '使用 StackEdit 在线渲染',
         getUrl: (filename) => {
           const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
           return `https://stackedit.io/app#url=${encodeURIComponent(rawUrl)}`;
@@ -563,11 +566,21 @@
       },
       {
         name: 'Dillinger',
-        description: '使用Dillinger在线编辑器',
+        description: '使用 Dillinger 在线渲染',
         getUrl: (filename) => {
           const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
           return `https://dillinger.io/?url=${encodeURIComponent(rawUrl)}`;
         }
+      },
+      {
+        name: 'GitHub',
+        description: 'GitHub blob 页面渲染（可能被浏览器阻止嵌入）',
+        getUrl: (filename) => `https://github.com/zhenmunse/run_global/blob/main/weekly_update/storage/${filename}`
+      },
+      {
+        name: 'GitLab',
+        description: 'GitLab blob 页面渲染',
+        getUrl: (filename) => `https://gitlab.com/zhenmunse/run_global/-/blob/main/weekly_update/storage/${filename}`
       }
     ];
 
@@ -759,26 +772,49 @@
         return;
       }
 
-      try {
-        const resp = await fetch(chosen.url);
-        if (!resp.ok) {
-          throw new Error(`Fetch failed: ${resp.status}`);
-        }
-        const md = await resp.text();
+      // 根据所选渲染器决定是页面内渲染还是使用 iframe 加载外部渲染器
+      const iframe = document.getElementById('issueFrame');
+      if (currentRenderer && currentRenderer.name === 'Marked') {
+        // 页面内渲染：fetch 并用 marked 渲染
+        if (iframe) iframe.style.display = 'none';
+        contentEl.style.display = 'block';
 
-        // 使用 marked 渲染（如果 marked 未加载，则显示原始文本）
-        if (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') {
-          contentEl.innerHTML = marked.parse(md);
-        } else {
-          contentEl.textContent = md;
+        try {
+          const resp = await fetch(chosen.url);
+          if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
+          const md = await resp.text();
+          if (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') {
+            contentEl.innerHTML = marked.parse(md);
+          } else {
+            contentEl.textContent = md;
+          }
+          hideLoading();
+        } catch (err) {
+          console.error('页面内渲染失败:', err);
+          hideLoading();
+          showError('页面内渲染失败，请检查控制台');
         }
+      } else {
+        // 外部渲染器：显示 iframe 并使用渲染器提供的 URL（有些渲染器会接受 raw URL 并渲染）
+        if (iframe) iframe.style.display = 'block';
+        contentEl.style.display = 'none';
 
-        // 简单地移除 loading
-        hideLoading();
-      } catch (err) {
-        console.error('加载或渲染 Markdown 失败:', err);
-        hideLoading();
-        showError('加载或渲染失败，请检查控制台');
+        try {
+          const rendererUrl = currentRenderer && typeof currentRenderer.getUrl === 'function'
+            ? currentRenderer.getUrl(file.filename)
+            : chosen.url;
+
+          iframe.src = rendererUrl;
+          iframe.onload = hideLoading;
+          iframe.onerror = () => {
+            hideLoading();
+            showError('外部渲染器加载失败（iframe），请尝试切换渲染器');
+          };
+        } catch (err) {
+          console.error('外部渲染器加载异常:', err);
+          hideLoading();
+          showError('外部渲染器加载失败，请检查控制台');
+        }
       }
 
       // 更新选择框状态
