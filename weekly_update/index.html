@@ -543,11 +543,7 @@
           </div>
         </div>
 
-        <!-- 渲染器选择（Marked / StackEdit / Dillinger 等） -->
-        <div class="renderer-selector">
-          <h3>渲染器</h3>
-          <div id="rendererButtons" class="renderer-buttons" aria-label="渲染器选择"></div>
-        </div>
+        <!-- （已移除）渲染器选择：当前统一使用 marked 页面内渲染 -->
 
         <!-- 当前显示的期刊 -->
         <div class="current-issue">
@@ -564,10 +560,8 @@
               <div class="spinner"></div>
               <p>正在加载期刊内容...</p>
             </div>
-            <!-- 渲染容器：使用前端 fetch + marked 渲染 Markdown 内容，避免 iframe 嵌入被 github.com 阻止 -->
-            <div id="issueContent" class="issue-content"></div>
-            <!-- 外部渲染器 iframe：仅在选择外部渲染器时显示 -->
-            <iframe id="issueFrame" class="issue-frame" frameborder="0" style="display:none"></iframe>
+            <!-- 渲染容器：使用前端 fetch + marked 渲染 Markdown 内容 -->
+            <div id="issueContent" class="issue-content markdown-body"></div>
           </div>
         </div>
       </div>
@@ -582,42 +576,26 @@
     // 引入 marked（用于 Markdown 到 HTML 渲染）
   </script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- DOMPurify for sanitizing HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+  <!-- highlight.js for code highlighting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.8.0/build/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.8.0/build/highlight.min.js"></script>
+  <script>hljs.configure({ignoreUnescapedHTML: true});</script>
+  <style>
+    /* Basic GitHub-like markdown styling (light weight) */
+    .markdown-body{ background:transparent; color:#e6eef8; }
+    .markdown-body h1,.markdown-body h2,.markdown-body h3{ color:#e6eef8 }
+    .markdown-body p{ color:var(--muted); line-height:1.7 }
+    .markdown-body pre{ background:#071224; padding:12px; border-radius:8px; overflow:auto }
+    .markdown-body code{ background:rgba(255,255,255,0.03); padding:2px 6px; border-radius:6px }
+    .markdown-body table{ border-collapse:collapse; width:100%; }
+    .markdown-body th, .markdown-body td{ border:1px solid rgba(255,255,255,0.06); padding:8px }
+    .markdown-body blockquote{ border-left:4px solid rgba(255,255,255,0.04); padding-left:12px; color:var(--muted) }
+  </style>
   <script>
-    // 常用Markdown渲染器配置
-    const RENDERERS = [
-      {
-        name: 'Marked',
-        description: '页面内使用 marked.js 渲染（快速、离线优先）',
-        default: true,
-        getUrl: (filename) => null
-      },
-      {
-        name: 'StackEdit',
-        description: '使用 StackEdit 在线渲染',
-        getUrl: (filename) => {
-          const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
-          return `https://stackedit.io/app#url=${encodeURIComponent(rawUrl)}`;
-        }
-      },
-      {
-        name: 'Dillinger',
-        description: '使用 Dillinger 在线渲染',
-        getUrl: (filename) => {
-          const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
-          return `https://dillinger.io/?url=${encodeURIComponent(rawUrl)}`;
-        }
-      },
-      {
-        name: 'GitHub',
-        description: 'GitHub blob 页面渲染（可能被浏览器阻止嵌入）',
-        getUrl: (filename) => `https://github.com/zhenmunse/run_global/blob/main/weekly_update/storage/${filename}`
-      },
-      {
-        name: 'GitLab',
-        description: 'GitLab blob 页面渲染',
-        getUrl: (filename) => `https://gitlab.com/zhenmunse/run_global/-/blob/main/weekly_update/storage/${filename}`
-      }
-    ];
+    // 使用单一渲染器：Marked 页面内渲染
+    const RENDERERS = [ { name: 'Marked', default: true } ];
 
     // 全局状态
     let currentRenderer = RENDERERS.find(r => r.default) || RENDERERS[0];
@@ -807,68 +785,32 @@
         return;
       }
 
-      // 根据所选渲染器决定是页面内渲染还是使用 iframe 加载外部渲染器
-      const iframe = document.getElementById('issueFrame');
-      if (currentRenderer && currentRenderer.name === 'Marked') {
-        // 页面内渲染：fetch 并用 marked 渲染
-        if (iframe) iframe.style.display = 'none';
-        contentEl.style.display = 'block';
+      // 现在统一使用页面内 marked 渲染：fetch -> marked -> DOMPurify -> insert -> highlight
+      try {
+        const resp = await fetch(chosen.url);
+        if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
+        const md = await resp.text();
 
-        try {
-          const resp = await fetch(chosen.url);
-          if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
-          const md = await resp.text();
-          if (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') {
-            contentEl.innerHTML = marked.parse(md);
-          } else {
-            contentEl.textContent = md;
-          }
-          hideLoading();
-        } catch (err) {
-          console.error('页面内渲染失败:', err);
-          hideLoading();
-          showError('页面内渲染失败，请检查控制台');
-        }
-      } else {
-        // 外部渲染器：显示 iframe 并使用渲染器提供的 URL（有些渲染器会接受 raw URL 并渲染）
-        if (iframe) iframe.style.display = 'block';
-        contentEl.style.display = 'none';
+        // 使用 marked 渲染为 HTML
+        const rawHtml = (typeof marked !== 'undefined' && marked && typeof marked.parse === 'function') ? marked.parse(md) : `<pre>${md}</pre>`;
 
-        // 处理“在新标签打开渲染器”按钮
-        const openBtn = document.getElementById('openRenderer');
-        if (openBtn) {
-          openBtn.classList.remove('show');
-          openBtn.href = '#';
+        // 使用 DOMPurify 清理 HTML
+        const clean = (typeof DOMPurify !== 'undefined' && DOMPurify) ? DOMPurify.sanitize(rawHtml) : rawHtml;
+
+        contentEl.innerHTML = clean;
+
+        // 使用 highlight.js 高亮代码块
+        if (typeof hljs !== 'undefined' && hljs) {
+          contentEl.querySelectorAll('pre code').forEach((block) => {
+            try { hljs.highlightBlock(block); } catch (e) { /* ignore */ }
+          });
         }
 
-        try {
-          const rendererUrl = currentRenderer && typeof currentRenderer.getUrl === 'function'
-            ? currentRenderer.getUrl(file.filename)
-            : chosen.url;
-
-          iframe.src = rendererUrl;
-          iframe.onload = () => {
-            hideLoading();
-            // 如果可以在新标签打开，也设置 openBtn
-            if (openBtn) {
-              openBtn.href = rendererUrl;
-              openBtn.classList.add('show');
-            }
-          };
-          iframe.onerror = () => {
-            hideLoading();
-            // 如果嵌入被阻止，给用户在新标签打开的选项
-            if (openBtn) {
-              openBtn.href = rendererUrl || chosen.url;
-              openBtn.classList.add('show');
-            }
-            showError('外部渲染器加载失败（iframe），已提供在新标签打开的选项');
-          };
-        } catch (err) {
-          console.error('外部渲染器加载异常:', err);
-          hideLoading();
-          showError('外部渲染器加载失败，请检查控制台');
-        }
+        hideLoading();
+      } catch (err) {
+        console.error('页面内渲染失败:', err);
+        hideLoading();
+        showError('页面内渲染失败，请检查控制台');
       }
 
       // 更新选择框状态
