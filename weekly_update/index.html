@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>润学周报 - 永不失联</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f1724; /* dark navy */
+      --card:#0b1220;
+      --accent:#6ea8fe;
+      --muted:rgba(255,255,255,0.65);
+      --glass: rgba(255,255,255,0.04);
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body {
+      font-family: 'Source Han Sans CN', 'Noto Sans SC', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(110,168,254,0.08), transparent),
+                  linear-gradient(180deg, var(--bg), #071224 60%);
+      margin: 0;
+      padding: 40px 20px;
+      color: #e6eef8;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{
+      max-width:940px;
+      margin:0 auto;
+    }
+    .banner{
+      position:fixed;
+      top:0;left:0;right:0;
+      background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      padding:10px 20px;
+      z-index:100;
+    }
+    .wrap{padding-top:72px}
+    .brand{display:flex;align-items:center;justify-content:space-between}
+    .brand-text{font-weight:600;color:#e6eef8}
+    h1{font-size:20px;margin:0}
+    header p{margin:0;color:var(--muted);font-size:13px}
+    .nav{display:flex;gap:8px;align-items:center}
+    .nav-item{
+      padding:8px 16px;
+      border-radius:10px;
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:500;
+      font-size:14px;
+      transition:all 0.2s ease;
+      border:1px solid transparent;
+    }
+    .nav-item:hover{
+      background:rgba(255,255,255,0.05);
+      color:#e6eef8;
+    }
+    .nav-item.active{
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#04263b;
+      font-weight:600;
+    }
+
+    /* main should be a layout container (not a card) so inner .card elements are the visible panels */
+    main{
+      display: grid;
+      gap: 24px;
+      margin-bottom: 28px;
+      background: transparent;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      padding:28px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+    }
+    .hero{ text-align:center; padding:40px 20px }
+    .hero h2{ font-size:32px; margin:0 0 16px 0; background:linear-gradient(135deg,var(--accent),#7dd3fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero p{ font-size:16px; color:var(--muted); margin:0; }
+
+    .issue-list{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+    }
+    .issue{
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:10px;
+      padding:20px;
+      transition:transform 0.2s ease, background 0.2s ease;
+    }
+    .issue:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,0.03);
+    }
+    .issue-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .issue-title{
+      font-size:18px;
+      font-weight:600;
+      margin:0;
+    }
+    .issue-date{
+      color:var(--muted);
+      font-size:13px;
+    }
+    .issue-summary{
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:16px;
+    }
+    .issue-link{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 12px;
+      border-radius:8px;
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#04263b;
+      text-decoration:none;
+      font-weight:600;
+      font-size:14px;
+      transition:transform 0.2s ease;
+    }
+    .issue-link:hover{
+      transform:translateY(-1px);
+    }
+
+    .control-panel{
+      background:transparent;
+      border:0;
+      padding:24px 0 8px 0;
+      margin-bottom:12px;
+      display:grid;
+      grid-template-columns:1fr 1fr auto;
+      gap:24px;
+      align-items:end;
+    }
+    .control-panel label{
+      display:block;
+      font-size:14px;
+      font-weight:600;
+      color:#e6eef8;
+      margin-bottom:8px;
+    }
+    .issue-selector, .renderer-selector{
+      display:flex;
+      flex-direction:column;
+    }
+    .issue-select{
+      padding:10px 14px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.02);
+      color:#e6eef8;
+      font-size:14px;
+      font-weight:500;
+      min-width:200px;
+      transition:all 0.2s ease;
+    }
+    .issue-select:focus{
+      outline:none;
+      border-color:var(--accent);
+      background:rgba(255,255,255,0.05);
+    }
+    .issue-select option{
+      background:#1a2332;
+      color:#e6eef8;
+      padding:8px;
+    }
+    
+    .renderer-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .renderer-btn{
+      padding:8px 12px;
+      border-radius:6px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.02);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:500;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      text-decoration:none;
+      display:inline-block;
+    }
+    .renderer-btn:hover{
+      background:rgba(255,255,255,0.05);
+      border-color:var(--accent);
+      color:#e6eef8;
+    }
+    .renderer-btn.active{
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#04263b;
+      border-color:transparent;
+    }
+
+    /* current-issue should not have an extra card border when wrapped by outer .card */
+    .current-issue{ background:transparent; border:0; padding:0; margin-top:12px }
+
+    .refresh-btn{
+      padding:10px 16px;
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:8px;
+      background:rgba(255,255,255,0.02);
+      color:var(--muted);
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      transition:all 0.2s ease;
+      white-space:nowrap;
+    }
+    .refresh-btn:hover{
+      background:rgba(255,255,255,0.05);
+      border-color:var(--accent);
+      color:#e6eef8;
+    }
+    
+    .current-renderer{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 12px;
+      border-radius:6px;
+      background:rgba(110,168,254,0.1);
+      border:1px solid rgba(110,168,254,0.3);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:600;
+    }
+    .current-renderer::before{
+      content:'📖';
+    }
+    .news-item{
+      background:rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:10px;
+      padding:20px;
+      transition:all 0.2s ease;
+    }
+    .news-item:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,0.03);
+      border-color:rgba(110,168,254,0.3);
+    }
+    .news-item-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+    }
+    .news-item-date{
+      font-size:16px;
+      font-weight:600;
+      margin:0;
+    }
+    .news-item-actions{
+      display:flex;
+      gap:8px;
+    }
+    .news-item-btn{
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-view{
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#04263b;
+    }
+    .btn-raw{
+      background:rgba(255,255,255,0.05);
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .news-item-btn:hover{
+      transform:translateY(-1px);
+    }
+    .news-item-preview{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+      margin:0;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      line-clamp:3;
+      -webkit-box-orient:vertical;
+    }
+
+    .current-issue{
+      background:rgba(255,255,255,0.01);
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .current-issue-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:20px 24px;
+      background:rgba(255,255,255,0.02);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    .current-issue-header h3{
+      margin:0;
+      font-size:18px;
+      color:#e6eef8;
+    }
+    .issue-actions{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .view-btn{
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:600;
+      transition:all 0.2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
+    .view-btn.secondary{
+      background:rgba(255,255,255,0.05);
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .view-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .issue-frame-container{
+      position:relative;
+      height:75vh;
+      min-height:500px;
+    }
+    .loading-indicator{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      bottom:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:rgba(15,23,36,0.9);
+      z-index:10;
+    }
+    .loading-indicator.hidden{
+      display:none;
+    }
+    .spinner{
+      width:32px;
+      height:32px;
+      border:3px solid rgba(255,255,255,0.1);
+      border-top:3px solid var(--accent);
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin-bottom:12px;
+    }
+    .loading-indicator p{
+      color:var(--muted);
+      margin:0;
+      font-size:14px;
+    }
+    .issue-frame{
+      width:100%;
+      height:100%;
+      border:none;
+      background:#fff;
+      border-radius:0 0 12px 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .guide-steps{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .step{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+    }
+    .step-number{
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),#7dd3fc);
+      color:#04263b;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:14px;
+      flex:0 0 28px;
+    }
+    .step-content{
+      flex:1;
+    }
+    .step-content strong{
+      display:block;
+      margin-bottom:4px;
+      color:#e6eef8;
+    }
+    .step-content p{
+      margin:0;
+      font-size:14px;
+    }
+    .step-content code{
+      background:rgba(255,255,255,0.1);
+      padding:2px 6px;
+      border-radius:4px;
+      font-family:monospace;
+      font-size:13px;
+    }
+
+    footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:40px;
+    }
+
+    @media (max-width:880px){
+      header{flex-direction:column;align-items:flex-start}
+      .nav{
+        width:100%;
+        justify-content:center;
+        margin-top:12px;
+      }
+      main{padding:20px}
+      .weekly-header h2{font-size:24px}
+      .control-panel{
+        grid-template-columns:1fr;
+        gap:16px;
+      }
+      .current-issue-header{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+      }
+      .issue-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .issue-frame-container{
+        height:60vh;
+        min-height:400px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="banner">
+      <div class="brand">
+        <div class="brand-text">润学周报 - 永不失联</div>
+        <nav class="nav">
+          <a href="/" class="nav-item">主页</a>
+          <a href="/weekly_update/" class="nav-item active">润学周报</a>
+          <a href="/about/" class="nav-item">关于</a>
+        </nav>
+      </div>
+    </div>
+
+    <main>
+      <div class="card hero">
+        <h2>润学周报</h2>
+        <p>每周为你精选润学相关的最新资讯、政策变化、经验分享和实用工具</p>
+      </div>
+      <div class="card">
+        <!-- 期刊选择器 -->
+        <div class="issue-selector">
+          <h3>选择期刊</h3>
+          <div class="selector-container">
+            <select id="issueSelect" class="issue-select">
+              <option value="">正在加载期刊列表...</option>
+            </select>
+            <button id="refreshBtn" class="refresh-btn" title="刷新期刊列表">🔄</button>
+          </div>
+        </div>
+
+        <!-- 当前显示的期刊 -->
+        <div class="current-issue">
+          <div class="current-issue-header">
+            <h3 id="currentIssueTitle">📰 润学周报</h3>
+            <div class="issue-actions">
+              <span id="currentRenderer" class="current-renderer">正在加载...</span>
+              <a id="viewRaw" href="#" target="_blank" class="view-btn secondary">📄 查看源码</a>
+            </div>
+          </div>
+          <div class="issue-frame-container">
+            <div id="loadingIndicator" class="loading-indicator">
+              <div class="spinner"></div>
+              <p>正在加载期刊内容...</p>
+            </div>
+            <iframe id="issueFrame" class="issue-frame" frameborder="0"></iframe>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>&copy; 2024 润学周报 - 永不失联项目</p>
+    </footer>
+  </div>
+
+  <script>
+    // 常用Markdown渲染器配置
+    const RENDERERS = [
+      {
+        name: 'GitHub',
+        description: '使用GitHub渲染器（推荐）',
+        default: true,
+        getUrl: (filename) => `https://github.com/zhenmunse/run_global/blob/main/weekly_update/storage/${filename}`
+      },
+      {
+        name: 'GitLab',
+        description: '使用GitLab渲染器',
+        getUrl: (filename) => `https://gitlab.com/zhenmunse/run_global/-/blob/main/weekly_update/storage/${filename}`
+      },
+      {
+        name: 'StackEdit',
+        description: '使用StackEdit在线编辑器',
+        getUrl: (filename) => {
+          const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
+          return `https://stackedit.io/app#url=${encodeURIComponent(rawUrl)}`;
+        }
+      },
+      {
+        name: 'Dillinger',
+        description: '使用Dillinger在线编辑器',
+        getUrl: (filename) => {
+          const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
+          return `https://dillinger.io/?url=${encodeURIComponent(rawUrl)}`;
+        }
+      }
+    ];
+
+    // 全局状态
+    let currentRenderer = RENDERERS.find(r => r.default) || RENDERERS[0];
+    let currentFile = null;
+    let availableFiles = [];
+
+    // 生成日期列表（最近60天）
+    function generateDateList() {
+      const dates = [];
+      const today = new Date();
+      
+      for (let i = 0; i < 60; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0]; // yyyy-mm-dd格式
+        dates.push(dateStr);
+      }
+      
+      return dates.sort().reverse(); // 最新的在前
+    }
+
+    // 检查文件是否存在
+    async function checkFileExists(filename) {
+      try {
+        const response = await fetch(`storage/${filename}`, { method: 'HEAD' });
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // 格式化日期显示
+    function formatDateDisplay(dateStr) {
+      const [year, month, day] = dateStr.split('-');
+      return `润学周报 - ${year}年${month}月${day}日`;
+    }
+
+    // 扫描可用的文件
+    async function scanAvailableFiles() {
+      const dates = generateDateList();
+      const files = [];
+      
+      for (const date of dates) {
+        const filename = `${date}.md`;
+        if (await checkFileExists(filename)) {
+          files.push({
+            date,
+            filename,
+            display: formatDateDisplay(date)
+          });
+        }
+      }
+      
+      return files.sort((a, b) => b.date.localeCompare(a.date)); // 最新的在前
+    }
+
+    // 渲染渲染器按钮
+    function renderRendererButtons() {
+      const container = document.getElementById('rendererButtons');
+      if (!container) return;
+
+      container.innerHTML = RENDERERS.map(renderer => 
+        `<button class="renderer-btn ${renderer === currentRenderer ? 'active' : ''}" 
+           title="${renderer.description}"
+           data-renderer="${renderer.name}">
+          ${renderer.name}
+        </button>`
+      ).join('');
+
+      // 添加点击事件
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.renderer-btn');
+        if (!btn) return;
+        
+        const rendererName = btn.dataset.renderer;
+        const renderer = RENDERERS.find(r => r.name === rendererName);
+        
+        if (renderer) {
+          currentRenderer = renderer;
+          updateRendererButtons();
+          updateCurrentRendererDisplay();
+          if (currentFile) {
+            loadFile(currentFile);
+          }
+        }
+      });
+    }
+
+    // 更新渲染器按钮状态
+    function updateRendererButtons() {
+      const buttons = document.querySelectorAll('.renderer-btn');
+      buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.renderer === currentRenderer.name);
+      });
+    }
+
+    // 更新当前渲染器显示
+    function updateCurrentRendererDisplay() {
+      const element = document.getElementById('currentRenderer');
+      if (element) {
+        element.textContent = currentRenderer.name;
+      }
+    }
+
+    // 渲染期刊选择下拉框
+    function renderIssueSelect() {
+      const select = document.getElementById('issueSelect');
+      if (!select) return;
+
+      if (availableFiles.length === 0) {
+        select.innerHTML = '<option value="">暂无可用期刊</option>';
+        return;
+      }
+
+      select.innerHTML = availableFiles.map(file => 
+        `<option value="${file.filename}" ${file === currentFile ? 'selected' : ''}>
+          ${file.display}
+        </option>`
+      ).join('');
+
+      // 添加选择事件
+      select.addEventListener('change', (e) => {
+        const filename = e.target.value;
+        const file = availableFiles.find(f => f.filename === filename);
+        if (file) {
+          loadFile(file);
+        }
+      });
+    }
+
+    // 加载文件
+    function loadFile(file) {
+      currentFile = file;
+      
+      // 更新标题
+      const titleElement = document.getElementById('currentIssueTitle');
+      if (titleElement) {
+        titleElement.textContent = `📰 ${file.display}`;
+      }
+      
+      // 更新源码链接
+      const rawLink = document.getElementById('viewRaw');
+      if (rawLink) {
+        rawLink.href = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${file.filename}`;
+      }
+      
+      // 显示加载状态
+      showLoading();
+      
+      // 加载到iframe
+      const iframe = document.getElementById('issueFrame');
+      if (iframe) {
+        const url = currentRenderer.getUrl(file.filename);
+        iframe.src = url;
+        
+        // 监听iframe加载完成
+        iframe.onload = hideLoading;
+        iframe.onerror = () => {
+          hideLoading();
+          showError('加载失败，请稍后重试');
+        };
+      }
+      
+      // 更新选择框状态
+      const select = document.getElementById('issueSelect');
+      if (select) {
+        select.value = file.filename;
+      }
+    }
+
+    // 显示加载状态
+    function showLoading() {
+      const loading = document.getElementById('loadingIndicator');
+      if (loading) {
+        loading.classList.remove('hidden');
+      }
+    }
+
+    // 隐藏加载状态
+    function hideLoading() {
+      const loading = document.getElementById('loadingIndicator');
+      if (loading) {
+        loading.classList.add('hidden');
+      }
+    }
+
+    // 显示错误信息
+    function showError(message) {
+      const loading = document.getElementById('loadingIndicator');
+      if (loading) {
+        loading.innerHTML = `
+          <div style="color: #ff6b6b;">
+            <p>❌ ${message}</p>
+            <button onclick="location.reload()" style="padding:8px 16px;margin-top:12px;border-radius:6px;border:1px solid #ff6b6b;background:transparent;color:#ff6b6b;cursor:pointer;">
+              重新加载
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // 刷新文件列表
+    async function refreshFileList() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '🔄 刷新中...';
+      }
+
+      try {
+        availableFiles = await scanAvailableFiles();
+        renderIssueSelect();
+        
+        // 如果当前没有选中文件，自动选择最新的
+        if (!currentFile && availableFiles.length > 0) {
+          loadFile(availableFiles[0]);
+        }
+      } catch (error) {
+        console.error('刷新文件列表失败:', error);
+        showError('刷新失败，请检查网络连接');
+      } finally {
+        if (refreshBtn) {
+          refreshBtn.disabled = false;
+          refreshBtn.textContent = '🔄 刷新列表';
+        }
+      }
+    }
+
+    // 初始化页面
+    async function initPage() {
+      // 渲染渲染器按钮
+      renderRendererButtons();
+      updateCurrentRendererDisplay();
+      
+      // 扫描并加载文件列表
+      await refreshFileList();
+      
+      // 绑定刷新按钮
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshFileList);
+      }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>
