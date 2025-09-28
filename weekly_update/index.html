@@ -357,6 +357,14 @@
       height:75vh;
       min-height:500px;
     }
+    .issue-content{
+      width:100%;
+      height:100%;
+      padding:20px;
+      overflow:auto; /* allow scrolling */
+      color:var(--muted);
+      background:transparent;
+    }
     .loading-indicator{
       position:absolute;
       top:0;
@@ -431,6 +439,19 @@
       margin-bottom:4px;
       color:#e6eef8;
     }
+    .open-renderer-btn{
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:600;
+      transition:all 0.2s ease;
+      display:none;
+      background:rgba(255,255,255,0.05);
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .open-renderer-btn.show{ display:inline-flex; }
     .step-content p{
       margin:0;
       font-size:14px;
@@ -473,6 +494,19 @@
         justify-content:flex-start;
       }
       .issue-frame-container{
+      .open-renderer-btn{
+        padding:6px 12px;
+        border-radius:6px;
+        text-decoration:none;
+        font-size:12px;
+        font-weight:600;
+        transition:all 0.2s ease;
+        display:none;
+        background:rgba(255,255,255,0.05);
+        color:var(--muted);
+        border:1px solid rgba(255,255,255,0.1);
+      }
+      .open-renderer-btn.show{ display:inline-flex; }
         height:60vh;
         min-height:400px;
       }
@@ -522,6 +556,7 @@
             <div class="issue-actions">
               <span id="currentRenderer" class="current-renderer">正在加载...</span>
               <a id="viewRaw" href="#" target="_blank" class="view-btn secondary">📄 查看源码</a>
+              <a id="openRenderer" class="open-renderer-btn" href="#" target="_blank">🔗 在新标签打开渲染器</a>
             </div>
           </div>
           <div class="issue-frame-container">
@@ -799,16 +834,35 @@
         if (iframe) iframe.style.display = 'block';
         contentEl.style.display = 'none';
 
+        // 处理“在新标签打开渲染器”按钮
+        const openBtn = document.getElementById('openRenderer');
+        if (openBtn) {
+          openBtn.classList.remove('show');
+          openBtn.href = '#';
+        }
+
         try {
           const rendererUrl = currentRenderer && typeof currentRenderer.getUrl === 'function'
             ? currentRenderer.getUrl(file.filename)
             : chosen.url;
 
           iframe.src = rendererUrl;
-          iframe.onload = hideLoading;
+          iframe.onload = () => {
+            hideLoading();
+            // 如果可以在新标签打开，也设置 openBtn
+            if (openBtn) {
+              openBtn.href = rendererUrl;
+              openBtn.classList.add('show');
+            }
+          };
           iframe.onerror = () => {
             hideLoading();
-            showError('外部渲染器加载失败（iframe），请尝试切换渲染器');
+            // 如果嵌入被阻止，给用户在新标签打开的选项
+            if (openBtn) {
+              openBtn.href = rendererUrl || chosen.url;
+              openBtn.classList.add('show');
+            }
+            showError('外部渲染器加载失败（iframe），已提供在新标签打开的选项');
           };
         } catch (err) {
           console.error('外部渲染器加载异常:', err);
