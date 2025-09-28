@@ -695,39 +695,94 @@
       });
     }
 
-    // 加载文件
-    function loadFile(file) {
+    // 选择可用的来源：优先尝试 jsDelivr CDN（快速、缓存友好），若 CDN 不可用则回退到 raw.githubusercontent
+    async function chooseSourceUrl(filename) {
+      const cdnUrl = `https://cdn.jsdelivr.net/gh/zhenmunse/run_global@main/weekly_update/storage/${filename}`;
+      const rawUrl = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${filename}`;
+
+      // 小工具：尝试 HEAD 请求检查资源可用性
+      async function headOk(url) {
+        try {
+          const res = await fetch(url, { method: 'HEAD' });
+          return res && res.ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // 先检查 CDN，再检查 raw；如果都不可用，返回 null
+      if (await headOk(cdnUrl)) {
+        return { type: 'cdn', url: cdnUrl };
+      }
+
+      if (await headOk(rawUrl)) {
+        return { type: 'raw', url: rawUrl };
+      }
+
+      return null;
+    }
+
+    // 加载文件到 iframe（使用 CDN 优先、RAW 回退策略）
+    async function loadFile(file) {
       currentFile = file;
-      
+
       // 更新标题
       const titleElement = document.getElementById('currentIssueTitle');
       if (titleElement) {
         titleElement.textContent = `📰 ${file.display}`;
       }
-      
-      // 更新源码链接
+
+      // 更新源码链接（始终指向 raw，以便用户直接打开原始 Markdown）
       const rawLink = document.getElementById('viewRaw');
       if (rawLink) {
         rawLink.href = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${file.filename}`;
       }
-      
-      // 显示加载状态
+
       showLoading();
-      
-      // 加载到iframe
+
       const iframe = document.getElementById('issueFrame');
-      if (iframe) {
-        const url = currentRenderer.getUrl(file.filename);
-        iframe.src = url;
-        
-        // 监听iframe加载完成
-        iframe.onload = hideLoading;
-        iframe.onerror = () => {
-          hideLoading();
-          showError('加载失败，请稍后重试');
-        };
+      if (!iframe) {
+        hideLoading();
+        return;
       }
-      
+
+      // 选择合适的源（cdn/raw）
+      const chosen = await chooseSourceUrl(file.filename);
+
+      try {
+        if (chosen) {
+          // 如果当前渲染器是 StackEdit 或 Dillinger，则把选中的原始 URL 包装到它们的在线渲染器中
+          if (currentRenderer && currentRenderer.name === 'StackEdit') {
+            iframe.src = `https://stackedit.io/app#url=${encodeURIComponent(chosen.url)}`;
+          } else if (currentRenderer && currentRenderer.name === 'Dillinger') {
+            iframe.src = `https://dillinger.io/?url=${encodeURIComponent(chosen.url)}`;
+          } else {
+            // 否则直接使用选中的 URL（CDN 或 RAW）。注意：直接加载 raw/ CDN 的 Markdown 会在 iframe 中以纯文本形式显示，
+            // 如果需要渲染为漂亮的 HTML，建议选择 StackEdit/Dillinger 作为渲染器。
+            iframe.src = chosen.url;
+          }
+
+          iframe.onload = hideLoading;
+          iframe.onerror = () => {
+            hideLoading();
+            showError('加载失败（iframe 加载出错），请稍后重试');
+          };
+        } else {
+          // 两者都不可用：回退到渲染器提供的 URL（例如 GitHub blob，注意可能会被浏览器阻止嵌入）
+          const fallbackUrl = currentRenderer.getUrl(file.filename);
+          iframe.src = fallbackUrl;
+          iframe.onload = hideLoading;
+          iframe.onerror = () => {
+            hideLoading();
+            showError('无法从 CDN 或 RAW 获取文件，且渲染器回退失败');
+          };
+        }
+      } catch (err) {
+        console.error('加载文件时出错:', err);
+        hideLoading();
+        showError('加载时发生异常，请检查控制台');
+      }
+
       // 更新选择框状态
       const select = document.getElementById('issueSelect');
       if (select) {
