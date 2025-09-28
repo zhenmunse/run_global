@@ -4,212 +4,400 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>永不失联</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --bg:#0f1724; /* dark navy */
-      --card:#0b1220;
-      --accent:#6ea8fe;
-      --muted:rgba(255,255,255,0.65);
-      --glass: rgba(255,255,255,0.04);
-      --radius:14px;
+    /* 现代深色风格 */
+    :root {
+      --bg: #0f1724;
+      --card: #1a2332;
+      --accent: #6ea8fe;
+      --muted: rgba(255,255,255,0.65);
+      --border: rgba(255,255,255,0.1);
+      --radius: 12px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(110,168,254,0.08), transparent),
-                  linear-gradient(180deg, var(--bg), #071224 60%);
+      font-family: 'Source Han Sans CN', 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #071224);
+      color: #e6eef8;
+      line-height: 1.6;
+      min-height: 100vh;
       margin: 0;
       padding: 40px 20px;
-      color: #e6eef8;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
     }
-    .wrap{
-      max-width:940px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:28px;
-      align-items:start;
+    
+    .banner{
+      position:fixed;
+      top:0;left:0;right:0;
+      background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      padding:10px 20px;
+      z-index:100;
     }
-    header{
-      grid-column:1/-1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-      padding:20px 26px;
-      border-radius:var(--radius);
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 72px 20px 20px;
     }
-    .brand{
-      display:flex;gap:14px;align-items:center
+    
+    .page-title {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
     }
-    .logo{
-      width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7dd3fc);display:flex;align-items:center;justify-content:center;flex:0 0 56px;font-weight:700;color:#04263b
+    
+    .page-title h1 {
+      font-size: 24px;
+      margin: 0;
     }
-    h1{font-size:20px;margin:0}
-    header p{margin:0;color:var(--muted);font-size:13px}
+    
+    .page-title p {
+      color: var(--muted);
+      margin: 8px 0 0 0;
+    }
 
-    main{background:transparent}
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-      padding:22px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
+      padding:28px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.03);
       box-shadow: 0 10px 30px rgba(2,6,23,0.6);
     }
-
-    .groups{display:flex;flex-direction:column;gap:12px}
-    .group{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:10px;background:var(--glass);
-      transition:transform .18s ease, background .18s ease;
+    .hero{ text-align:center; padding:40px 20px }
+    .hero h2{ font-size:32px; margin:0 0 16px 0; background:linear-gradient(135deg,var(--accent),#7dd3fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero p{ font-size:16px; color:var(--muted); margin:0; line-height:1.6 }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .group:hover{transform:translateY(-6px);background:rgba(255,255,255,0.03)}
-    .meta{flex:1;text-align:left}
-    .meta b{display:block;font-size:15px}
-    .meta small{color:var(--muted);display:block;margin-top:4px}
-    .actions{display:flex;gap:8px;align-items:center}
-    .btn{
-      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#04263b;font-weight:600;cursor:pointer;text-decoration:none;font-size:14px
+    
+    .brand-text{font-weight:600;color:#e6eef8}
+    
+    .nav {
+      display: flex;
+      gap: 8px;
     }
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
-    .btn:active{transform:translateY(1px)}
-
-    aside .card{position:sticky;top:24px}
-    .small{font-size:13px;color:var(--muted)}
-
-    footer{grid-column:1/-1;margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
-
-    @media (max-width:880px){
-      .wrap{grid-template-columns:1fr}
-      header{flex-direction:column;align-items:flex-start}
-      aside{order:2}
+    
+    .nav-item{
+      padding:8px 16px;
+      border-radius:10px;
+      text-decoration:none;
+      color:var(--muted);
+      font-weight:500;
+      font-size:14px;
+      transition:all 0.2s ease;
+      border:1px solid transparent;
+    }
+    .nav-item:hover{background:rgba(255,255,255,0.05);color:#e6eef8}
+    .nav-item.active{background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#04263b;font-weight:600}
+    
+    .notice {
+      background: rgba(255,193,7,0.1);
+      border: 1px solid rgba(255,193,7,0.3);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: center;
+      color: #ffc107;
+    }
+    
+    .groups {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    
+    .group-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+    
+    .group-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+    
+    .group-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #e6eef8;
+    }
+    
+    .group-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .qq-number {
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .member-count {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    
+    .group-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .join-btn, .copy-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    
+    .join-btn {
+      background: linear-gradient(135deg, var(--accent), #7dd3fc);
+      color: #04263b;
+    }
+    
+    .copy-btn {
+      background: rgba(255,255,255,0.08);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    
+    .join-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(110,168,254,0.3);
+    }
+    
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.12);
+      color: #e6eef8;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #e6eef8;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .banner {
+        padding: 8px 16px;
+      }
+      
+      .brand {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .nav {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .container {
+        padding: 100px 16px 20px;
+      }
+      
+      .groups {
+        grid-template-columns: 1fr;
+      }
+      
+      .group-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>QQ群链接库</h1>
-    <p>请收藏此页面，避免失联</p>
-    <p>部分浏览器环境“加入”按钮可能无法正常工作，此时请复制群号手动加群！</p>
-  </header>
-
-  <div class="container">
-    <h2 class="small" style="margin-top:0;margin-bottom:12px">当前可用的群</h2>
-    <div class="card">
-      <div class="groups" role="list">
-        <div class="group" role="listitem" data-qq="2167055144">
-          <div class="meta">
-            <b>大群</b>
-            <small>群号：<span class="qq">2167055144</span></small>
-          </div>
-          <div class="actions">
-            <a class="btn" href="https://qm.qq.com/cgi-bin/qm/qr?k=2167055144" target="_blank" rel="noopener noreferrer" aria-label="打开大群邀请链接">加入</a>
-            <button class="btn ghost" data-copy aria-label="复制群号">复制</button>
-          </div>
-        </div>
-
-        <div class="group" role="listitem" data-qq="1064090273">
-          <div class="meta">
-            <b>日语交流群</b>
-            <small>群号：<span class="qq">1064090273</span></small>
-          </div>
-          <div class="actions">
-            <a class="btn" href="https://qm.qq.com/cgi-bin/qm/qr?k=1064090273" target="_blank" rel="noopener noreferrer">加入</a>
-            <button class="btn ghost" data-copy>复制</button>
-          </div>
-        </div>
-
-        <div class="group" role="listitem" data-qq="769931954">
-          <div class="meta">
-            <b>美国/加拿大交流群</b>
-            <small>群号：<span class="qq">769931954</span></small>
-          </div>
-          <div class="actions">
-            <a class="btn" href="https://qm.qq.com/cgi-bin/qm/qr?k=769931954" target="_blank" rel="noopener noreferrer">加入</a>
-            <button class="btn ghost" data-copy>复制</button>
-          </div>
-        </div>
-
-        <div class="group" role="listitem" data-qq="1061445992">
-          <div class="meta">
-            <b>澳洲/新西兰交流群</b>
-            <small>群号：<span class="qq">1061445992</span></small>
-          </div>
-          <div class="actions">
-            <a class="btn" href="https://qm.qq.com/cgi-bin/qm/qr?k=1061445992" target="_blank" rel="noopener noreferrer">加入</a>
-            <button class="btn ghost" data-copy>复制</button>
-          </div>
-        </div>
-
-        <div class="group" role="listitem" data-qq="857225570">
-          <div class="meta">
-            <b>德语交流群</b>
-            <small>群号：<span class="qq">857225570</span></small>
-          </div>
-          <div class="actions">
-            <a class="btn" href="https://qm.qq.com/cgi-bin/qm/qr?k=857225570" target="_blank" rel="noopener noreferrer">加入</a>
-            <button class="btn ghost" data-copy>复制</button>
-          </div>
-        </div>
-      </div>
+  <div class="banner">
+    <div class="brand">
+      <div class="brand-text">永不失联</div>
+      <nav class="nav">
+        <a href="/" class="nav-item active">主页</a>
+        <a href="/weekly_update/" class="nav-item">润学周报</a>
+        <a href="/about/" class="nav-item">关于</a>
+      </nav>
     </div>
   </div>
 
-  <footer>
-    <p>最后更新：2025年9月28日</p>
-  </footer>
+  <div class="container">
+    <div class="card hero">
+      <h2>QQ群链接库</h2>
+      <p>请收藏此页面，避免失联</p>
+    </div>
+    
+    <div class="notice">
+      <p>部分浏览器环境"加入"按钮可能无法正常工作，此时请复制群号手动加群！</p>
+    </div>
 
-  <div id="toast" aria-live="polite" style="position:fixed;left:50%;transform:translateX(-50%);bottom:28px;background:linear-gradient(90deg,var(--accent),#7dd3fc);color:#04263b;padding:10px 16px;border-radius:10px;box-shadow:0 6px 20px rgba(2,6,23,0.6);display:none;font-weight:700;z-index:9999"></div>
+    <div class="groups">
+      <!-- QQ群列表将在这里动态加载 -->
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast"></div>
+  </div>
 
   <script>
-    (function(){
-      function showToast(msg){
-        var t = document.getElementById('toast');
-        t.textContent = msg; t.style.display = 'block';
-        clearTimeout(t._h);
-        t._h = setTimeout(function(){ t.style.display='none'; }, 2500);
+    // QQ群数据
+    const groups = [
+      {
+        name: "总群",
+        qq: "2167055144",
+        members: "2000人"
+      },
+      {
+        name: "日语交流群",
+        qq: "1064090273"
+        // members: "人数待更新"
+      },
+      {
+        name: "美国/加拿大交流群",
+        qq: "769931954"
+        // members: "人数待更新"
+      },
+      {
+        name: "澳洲/新西兰交流群",
+        qq: "1061445992"
+        // members: "人数待更新"
+      },
+      {
+        name: "德语交流群",
+        qq: "857225570"
+        // members: "人数待更新"
       }
+    ];
 
-      function copyText(text){
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          return navigator.clipboard.writeText(text);
+    // Toast 提示函数
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // 复制到剪贴板
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        // 回退方案
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          return true;
+        } catch (err) {
+          document.body.removeChild(textArea);
+          return false;
         }
-        return new Promise(function(resolve,reject){
-          var ta = document.createElement('textarea');
-          ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
-          ta.select();
-          try{ document.execCommand('copy'); document.body.removeChild(ta); resolve(); }
-          catch(e){ document.body.removeChild(ta); reject(e); }
-        });
       }
+    }
 
-      document.querySelectorAll('[data-copy]').forEach(function(btn){
-        btn.addEventListener('click', function(){
-          var grp = btn.closest('.group');
-          if(!grp) return;
-          var qq = grp.getAttribute('data-qq') || grp.querySelector('.qq') && grp.querySelector('.qq').textContent;
-          if(!qq) return showToast('未能获取群号');
-          copyText(qq).then(function(){
-            showToast('已复制：' + qq);
-          }).catch(function(){
-            // 回退：选中文本，提示用户手动复制
-            var el = grp.querySelector('.qq');
-            if(el){
-              var range = document.createRange();
-              range.selectNodeContents(el);
-              var s = window.getSelection(); s.removeAllRanges(); s.addRange(range);
-            }
-            showToast('请手动复制群号：' + qq);
-          });
-        });
+    // 加入QQ群
+    function joinGroup(qq) {
+      // 尝试打开QQ加群链接
+      const qqUrl = `tencent://groupwpa/?subcmd=all&param=7C2F2F67726F75702E71712E636F6D2F${qq}2F2F2F`;
+      
+      // 创建隐藏的链接并点击
+      const link = document.createElement('a');
+      link.href = qqUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // 同时复制群号
+      copyToClipboard(qq).then(success => {
+        if (success) {
+          showToast(`已尝试打开QQ加群，群号 ${qq} 已复制到剪贴板`);
+        } else {
+          showToast(`请手动复制群号：${qq}`);
+        }
       });
-    })();
+    }
+
+    // 复制群号
+    function copyGroupNumber(qq) {
+      copyToClipboard(qq).then(success => {
+        if (success) {
+          showToast(`群号 ${qq} 已复制到剪贴板`);
+        } else {
+          showToast(`复制失败，请手动复制：${qq}`);
+        }
+      });
+    }
+
+    // 渲染群组列表
+    function renderGroups() {
+      const container = document.querySelector('.groups');
+
+      container.innerHTML = groups.map(group => `
+        <div class="group-card">
+          <div class="group-title">${group.name}</div>
+          <div class="group-info">
+            <span class="qq-number">${group.qq}</span>
+            ${group.members ? `<span class="member-count">${group.members}</span>` : ``}
+          </div>
+          <div class="group-actions">
+            <button class="join-btn" onclick="joinGroup('${group.qq}')">
+              加入群聊
+            </button>
+            <button class="copy-btn" onclick="copyGroupNumber('${group.qq}')">
+              复制群号
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      renderGroups();
+    });
   </script>
 </body>
 </html>
