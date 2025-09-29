@@ -5,22 +5,41 @@
   // state
   let widgetId = null;
   let isExecuting = false;
-  
+  let turnstileReady = false;
+
   // 回调由 Turnstile 调用
   window.onTurnstileVerified = (token) => {
     window.__ts_token = token || '';
     if (window.__ts_resolve) { window.__ts_resolve(token); window.__ts_resolve = null; }
   };
-  
+
+  // 等待 turnstile 脚本加载
+  function waitForTurnstile(timeout = 5000) {
+    return new Promise((resolve) => {
+      if (typeof window.turnstile !== 'undefined') { turnstileReady = true; return resolve(true); }
+      const start = Date.now();
+      const t = setInterval(() => {
+        if (typeof window.turnstile !== 'undefined') { clearInterval(t); turnstileReady = true; return resolve(true); }
+        if (Date.now() - start > timeout) { clearInterval(t); return resolve(false); }
+      }, 150);
+    });
+  }
+
   // render 一次（避免重复 render 导致的错误）
-  function renderTurnstileOnce() {
+  async function renderTurnstileOnce() {
     const el = qs('#cf-turnstile');
-    if (!el || typeof window.turnstile === 'undefined') return;
-    if (widgetId !== null) return; // 已渲染
+    if (!el) return;
+    if (widgetId !== null) return;
+    const ok = await waitForTurnstile(7000);
+    if (!ok) {
+      console.warn('turnstile script 未就绪');
+      return;
+    }
     try {
       // 合法的 size: "normal" | "compact" | "flexible"
+      const sitekey = el.dataset.sitekey || '0x4AAAAAAB3z0RR14y0mYVTp';
       widgetId = window.turnstile.render(el, {
-        sitekey: el.dataset.sitekey || '0x4AAAAAAB3z0RR14y0mYVTp',
+        sitekey,
         callback: 'onTurnstileVerified',
         size: 'compact'
       });
@@ -29,27 +48,28 @@
       widgetId = null;
     }
   }
-  
+
   // 获取 token：reset -> execute -> 等待回调
   function getTurnstileToken(timeout = 7000) {
     return new Promise((resolve) => {
-      if (typeof window.turnstile === 'undefined' || widgetId === null) return resolve(null);
-      if (window.__ts_token) return resolve(window.__ts_token);
+      if (!turnstileReady || typeof window.turnstile === 'undefined' || widgetId === null) return resolve(null);
+      if (window.__ts_token) { const t = window.__ts_token; return resolve(t); }
       let done = false;
       window.__ts_resolve = (t) => { if (!done) { done = true; resolve(t || null); window.__ts_resolve = null; } };
       try {
-        // 防止重复执行
         if (isExecuting) { resolve(null); window.__ts_resolve = null; return; }
         isExecuting = true;
-        window.turnstile.reset(widgetId);
+        // reset 保证拿到新 token
+        try { window.turnstile.reset(widgetId); } catch(e){}
         window.turnstile.execute(widgetId);
       } catch (e) {
+        console.warn('turnstile execute failed', e);
         if (!done) { done = true; resolve(null); window.__ts_resolve = null; }
       }
       setTimeout(() => { if (!done) { done = true; resolve(null); window.__ts_resolve = null; isExecuting = false; } }, timeout);
     });
   }
-  
+
   function validateEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
   function validateQQ(v){ if (!v) return true; return /^[1-9]\d{4,}$/.test(v); }
 
@@ -57,7 +77,7 @@
     e.preventDefault();
     const status = qs('#cf-status');
     const btn = qs('#cf-submit');
-    isExecuting = false;
+
     const name = qs('#cf-name')?.value.trim() || '';
     const email = qs('#cf-email')?.value.trim() || '';
     const qq = qs('#cf-qq')?.value.trim() || '';
@@ -74,15 +94,19 @@
     status.textContent = '正在验证…';
     btn.disabled = true;
 
-    // 获取 Turnstile token
+    // 尝试获取 Turnstile token；若失败给出明确提示（用户侧问题）
     let token = null;
-    if (typeof window.turnstile !== 'undefined' && widgetId !== null) {
+    await renderTurnstileOnce();
+    if (turnstileReady && widgetId !== null) {
       token = await getTurnstileToken();
+      isExecuting = false;
     }
-    isExecuting = false;
+
     if (!token) {
       btn.disabled = false;
-      return status.textContent = '验证失败，请刷新页面后重试';
+      status.textContent = '验证失败（Turnstile 未返回 token）。请尝试隐身模式或检查浏览器扩展/清除 Cookie 后重试。';
+      console.warn('Turnstile token 获取失败。turnstileReady=', turnstileReady, 'widgetId=', widgetId, 'window.__ts_token=', window.__ts_token);
+      return;
     }
 
     status.textContent = '发送中…';
@@ -106,6 +130,7 @@
         status.textContent = data.message || '发送失败，请稍后再试';
       }
     } catch (err) {
+      console.warn('fetch /api/contact 错误', err);
       status.textContent = '网络异常，请稍后再试';
     } finally {
       btn.disabled = false;
