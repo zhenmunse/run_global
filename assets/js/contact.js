@@ -4,13 +4,14 @@
 
   // state
   let widgetId = null;
-
+  let isExecuting = false;
+  
   // 回调由 Turnstile 调用
   window.onTurnstileVerified = (token) => {
     window.__ts_token = token || '';
     if (window.__ts_resolve) { window.__ts_resolve(token); window.__ts_resolve = null; }
   };
-
+  
   // render 一次（避免重复 render 导致的错误）
   function renderTurnstileOnce() {
     const el = qs('#cf-turnstile');
@@ -28,7 +29,7 @@
       widgetId = null;
     }
   }
-
+  
   // 获取 token：reset -> execute -> 等待回调
   function getTurnstileToken(timeout = 7000) {
     return new Promise((resolve) => {
@@ -37,16 +38,18 @@
       let done = false;
       window.__ts_resolve = (t) => { if (!done) { done = true; resolve(t || null); window.__ts_resolve = null; } };
       try {
-        // reset 确保 execute 会返回新 token
+        // 防止重复执行
+        if (isExecuting) { resolve(null); window.__ts_resolve = null; return; }
+        isExecuting = true;
         window.turnstile.reset(widgetId);
         window.turnstile.execute(widgetId);
       } catch (e) {
         if (!done) { done = true; resolve(null); window.__ts_resolve = null; }
       }
-      setTimeout(() => { if (!done) { done = true; resolve(null); window.__ts_resolve = null; } }, timeout);
+      setTimeout(() => { if (!done) { done = true; resolve(null); window.__ts_resolve = null; isExecuting = false; } }, timeout);
     });
   }
-
+  
   function validateEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
   function validateQQ(v){ if (!v) return true; return /^[1-9]\d{4,}$/.test(v); }
 
@@ -54,7 +57,7 @@
     e.preventDefault();
     const status = qs('#cf-status');
     const btn = qs('#cf-submit');
-
+    isExecuting = false;
     const name = qs('#cf-name')?.value.trim() || '';
     const email = qs('#cf-email')?.value.trim() || '';
     const qq = qs('#cf-qq')?.value.trim() || '';
@@ -76,6 +79,7 @@
     if (typeof window.turnstile !== 'undefined' && widgetId !== null) {
       token = await getTurnstileToken();
     }
+    isExecuting = false;
     if (!token) {
       btn.disabled = false;
       return status.textContent = '验证失败，请刷新页面后重试';

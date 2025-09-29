@@ -192,8 +192,8 @@
           <!-- 蜜罐字段：正常用户不可见，机器人若填写将被拒绝 -->
           <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" style="display:none">
 
-          <!-- Cloudflare Turnstile (invisible) 占位，前端脚本会触发并获取 token -->
-          <div id="cf-turnstile" data-sitekey="0x4AAAAAAB3z0RR14y0mYVTp"></div>
+          <!-- Cloudflare Turnstile 占位：不要在 HTML 中放 data-sitekey（避免自动渲染），JS 会手动 render -->
+          <div id="cf-turnstile"></div>
 
           <div class="form-actions">
             <button type="submit" id="cf-submit">发送留言</button>
