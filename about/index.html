@@ -192,8 +192,8 @@
           <!-- 蜜罐字段：正常用户不可见，机器人若填写将被拒绝 -->
           <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" style="display:none">
 
-            <!-- Cloudflare Turnstile (invisible) 占位，前端脚本会触发并获取 token -->
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAAB3z0RR14y0mYVTp" data-theme="dark" data-size="invisible" style="display:none"></div>
+          <!-- Cloudflare Turnstile (invisible) 占位，前端脚本会触发并获取 token -->
+          <div id="cf-turnstile" data-sitekey="0x4AAAAAAB3z0RR14y0mYVTp"></div>
 
           <div class="form-actions">
             <button type="submit" id="cf-submit">发送留言</button>
@@ -210,7 +210,7 @@
     </footer>
   </div>
   <!-- 前端逻辑：留言提交与 Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
   <script src="/assets/js/contact.js" defer></script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </body>
 </html>
