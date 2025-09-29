@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>润学周报 - 永不失联</title>
+  <title>润学周报 - 润物有声</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -400,7 +400,7 @@
   <div class="wrap">
     <div class="banner">
       <div class="brand">
-        <div class="brand-text">润学周报 - 永不失联</div>
+        <div class="brand-text">润学周报 - 润物有声</div>
         <nav class="nav">
           <a href="/" class="nav-item">主页</a>
           <a href="/weekly_update/" class="nav-item active">润学周报</a>
@@ -423,6 +423,7 @@
               <option value="">正在加载期刊列表...</option>
             </select>
             <button id="refreshBtn" class="refresh-btn" title="刷新期刊列表">🔄</button>
+            <button id="forceRefreshBtn" class="force-refresh-btn" title="强制刷新最新周报">⚡ 强制刷新</button>
           </div>
         </div>
 
@@ -447,12 +448,28 @@
     </main>
 
     <footer>
-      <p>&copy; 2024 润学周报 - 永不失联项目</p>
+      <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
     </footer>
   </div>
 
   <script src="../assets/js/weekly_update.js" defer></script>
   <style>
+    /* 强制刷新按钮的最小样式，放在页面局部以避免影响全局 */
+    .force-refresh-btn{
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:8px;
+      background:linear-gradient(90deg,var(--accent),#7dd3fc);
+      color:#04263b;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+      transition:all 0.18s ease;
+      white-space:nowrap;
+      margin-left:8px;
+    }
+    .force-refresh-btn:hover{ transform:translateY(-1px); }
+
     /* Basic GitHub-like markdown styling (light weight) */
     .markdown-body{ background:transparent; color:#e6eef8; }
     .markdown-body h1,.markdown-body h2,.markdown-body h3{ color:#e6eef8 }

@@ -169,7 +169,8 @@ async function chooseSourceUrl(filename) {
 }
 
 // 加载文件并在页面内渲染 Markdown（优先 CDN，回退 RAW）
-async function loadFile(file) {
+// loadFile accepts optional options: { force: boolean }
+async function loadFile(file, options = {}) {
   currentFile = file;
 
   // 更新标题
@@ -191,8 +192,15 @@ async function loadFile(file) {
     return;
   }
 
-  // 选择合适的源（cdn/raw）
-  const chosen = await chooseSourceUrl(file.filename);
+  // 如果 options.force 为 true，则直接从 raw 拉取并绕过 CDN 检查
+  let chosen = null;
+  if (options && options.force) {
+    const rawUrlBase = `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${file.filename}`;
+    chosen = { type: 'raw', url: rawUrlBase };
+  } else {
+    // 选择合适的源（cdn/raw）
+    chosen = await chooseSourceUrl(file.filename);
+  }
 
   if (!chosen) {
     hideLoading();
@@ -202,7 +210,7 @@ async function loadFile(file) {
 
   // 现在统一使用页面内 marked 渲染：fetch -> marked -> DOMPurify -> insert -> highlight
   try {
-    // 强制为所有来源添加时间戳参数并使用 no-store，最大化避免代理/CDN/浏览器缓存导致的旧内容
+    // 为所有来源添加时间戳参数并使用 no-store，最大化避免代理/CDN/浏览器缓存导致的旧内容
     let fetchUrl = chosen.url;
     const sep = fetchUrl.includes('?') ? '&' : '?';
     fetchUrl = `${fetchUrl}${sep}_=${Date.now()}`;
@@ -272,6 +280,19 @@ function showError(message) {
   }
 }
 
+// 简单的 toast 函数（如果页面没有定义）
+function showToast(message) {
+  try {
+    const t = document.getElementById('loadingIndicator');
+    if (t) {
+      // 在 loading 区域短暂替换文本
+      const prev = t.innerHTML;
+      t.innerHTML = `<div style="color:#7dd3fc">${message}</div>`;
+      setTimeout(()=>{ t.innerHTML = prev; }, 2000);
+    }
+  } catch(e) { /* ignore */ }
+}
+
 // 刷新文件列表
 async function refreshFileList() {
   const refreshBtn = document.getElementById('refreshBtn');
@@ -313,6 +334,28 @@ async function initPage() {
   const refreshBtn = document.getElementById('refreshBtn');
   if (refreshBtn) {
     refreshBtn.addEventListener('click', refreshFileList);
+  }
+
+  // 绑定强制刷新按钮（如果存在）
+  const forceBtn = document.getElementById('forceRefreshBtn');
+  if (forceBtn) {
+    forceBtn.addEventListener('click', async () => {
+      if (!currentFile) {
+        showToast && showToast('未选择期刊，无法强制刷新');
+        return;
+      }
+      // 临时显示加载状态并强制重新拉取
+      showLoading();
+      try {
+        await loadFile(currentFile, { force: true });
+        showToast && showToast('已强制刷新为最新内容');
+      } catch (e) {
+        console.error('强制刷新失败', e);
+        showError('强制刷新失败');
+      } finally {
+        hideLoading();
+      }
+    });
   }
 }
 
