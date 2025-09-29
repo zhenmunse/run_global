@@ -5,7 +5,8 @@ workers_dev = false
 
 routes = [
   { pattern = "vineshore.org/api/contact", zone_name = "vineshore.org" },
-  { pattern = "www.vineshore.org/api/contact", zone_name = "vineshore.org" }
+  { pattern = "www.vineshore.org/api/contact", zone_name = "vineshore.org" },
+  { pattern = "home.vineshore.org/api/contact", zone_name = "vineshore.org" }
 ]
 
 kv_namespaces = [
