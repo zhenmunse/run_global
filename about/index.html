@@ -192,8 +192,13 @@
           <!-- 蜜罐字段：正常用户不可见，机器人若填写将被拒绝 -->
           <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off" style="display:none">
 
-          <!-- Cloudflare Turnstile 占位：不要在 HTML 中放 data-sitekey（避免自动渲染），JS 会手动 render -->
-          <div id="cf-turnstile" data-sitekey="0x4AAAAAAB3z0RR14y0mYVTp"></div>
+          <!-- Turnstile 小部件（自动渲染，回调见 assets/js/contact.js 的 onTurnstileVerified） -->
+          <div class="form-row">
+            <div class="cf-turnstile"
+                 data-sitekey="0x4AAAAAAB3z0RR14y0mYVTp"
+                 data-callback="onTurnstileVerified"
+                 data-size="compact"></div>
+          </div>
 
           <div class="form-actions">
             <button type="submit" id="cf-submit">发送留言</button>
@@ -209,8 +214,8 @@
       <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
     </footer>
   </div>
-  <!-- 前端逻辑：留言提交与 Turnstile -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+  <!-- 仅保留一次脚本引入（自动渲染 Turnstile + 表单逻辑） -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="/assets/js/contact.js" defer></script>
 </body>
 </html>
