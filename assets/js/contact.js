@@ -4,13 +4,16 @@
 
   // state
   let widgetId = null;
-  let isExecuting = false;
   let turnstileReady = false;
+  let tokenPromise = null; // 单一的 token 等待 promise
 
   // 回调由 Turnstile 调用
   window.onTurnstileVerified = (token) => {
     window.__ts_token = token || '';
-    if (window.__ts_resolve) { window.__ts_resolve(token); window.__ts_resolve = null; }
+    if (window.__ts_resolve) { 
+      try { window.__ts_resolve(token); } catch(e){ /* ignore */ }
+      window.__ts_resolve = null;
+    }
   };
 
   // 等待 turnstile 脚本加载
@@ -36,12 +39,11 @@
       return;
     }
     try {
-      // 合法的 size: "normal" | "compact" | "flexible"
       const sitekey = el.dataset.sitekey || '0x4AAAAAAB3z0RR14y0mYVTp';
       widgetId = window.turnstile.render(el, {
         sitekey,
         callback: 'onTurnstileVerified',
-        size: 'compact'
+        size: 'compact' // 合法值
       });
     } catch (e) {
       console.warn('turnstile render failed', e);
@@ -49,25 +51,55 @@
     }
   }
 
-  // 获取 token：reset -> execute -> 等待回调
+  // 获取 token（单一并发控制、异常重试、清理）
   function getTurnstileToken(timeout = 7000) {
-    return new Promise((resolve) => {
-      if (!turnstileReady || typeof window.turnstile === 'undefined' || widgetId === null) return resolve(null);
-      if (window.__ts_token) { const t = window.__ts_token; return resolve(t); }
-      let done = false;
-      window.__ts_resolve = (t) => { if (!done) { done = true; resolve(t || null); window.__ts_resolve = null; } };
-      try {
-        if (isExecuting) { resolve(null); window.__ts_resolve = null; return; }
-        isExecuting = true;
-        // reset 保证拿到新 token
-        try { window.turnstile.reset(widgetId); } catch(e){}
-        window.turnstile.execute(widgetId);
-      } catch (e) {
-        console.warn('turnstile execute failed', e);
-        if (!done) { done = true; resolve(null); window.__ts_resolve = null; }
-      }
-      setTimeout(() => { if (!done) { done = true; resolve(null); window.__ts_resolve = null; isExecuting = false; } }, timeout);
+    if (!turnstileReady || typeof window.turnstile === 'undefined' || widgetId === null) return Promise.resolve(null);
+    if (window.__ts_token) return Promise.resolve(window.__ts_token);
+
+    if (tokenPromise) return tokenPromise; // 有待定的执行，复用
+
+    tokenPromise = new Promise((resolve) => {
+      let settled = false;
+      const cleanup = () => {
+        tokenPromise = null;
+        window.__ts_resolve = null;
+        // 不自动清 window.__ts_token，让后续逻辑可读
+      };
+      window.__ts_resolve = (t) => {
+        if (settled) return;
+        settled = true;
+        resolve(t || null);
+        cleanup();
+      };
+
+      const doExecute = () => {
+        try {
+          // reset 确保 execute 会拿到新 token
+          try { window.turnstile.reset(widgetId); } catch(e){ /* ignore */ }
+          window.turnstile.execute(widgetId);
+        } catch (e) {
+          console.warn('turnstile execute 抛出异常，重试一次', e);
+          // 重试一次（短延迟），若仍失败则 resolve null
+          setTimeout(() => {
+            try {
+              window.turnstile.reset(widgetId);
+              window.turnstile.execute(widgetId);
+            } catch (e2) {
+              if (!settled) { settled = true; resolve(null); cleanup(); }
+            }
+          }, 250);
+        }
+      };
+
+      doExecute();
+
+      // 超时保护
+      setTimeout(() => {
+        if (!settled) { settled = true; resolve(null); cleanup(); }
+      }, timeout);
     });
+
+    return tokenPromise;
   }
 
   function validateEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
@@ -94,12 +126,10 @@
     status.textContent = '正在验证…';
     btn.disabled = true;
 
-    // 尝试获取 Turnstile token；若失败给出明确提示（用户侧问题）
-    let token = null;
     await renderTurnstileOnce();
+    let token = null;
     if (turnstileReady && widgetId !== null) {
       token = await getTurnstileToken();
-      isExecuting = false;
     }
 
     if (!token) {
@@ -110,7 +140,6 @@
     }
 
     status.textContent = '发送中…';
-
     const payload = { name, email, qq, message, cf_turnstile_response: token };
 
     try {
