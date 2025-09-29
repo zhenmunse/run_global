@@ -63,8 +63,34 @@ export default {
     // 通过第三方邮件服务发送（SendGrid 优先；无则尝试 Resend；都无则报错）
     let sent = false, errMsg = '';
     if (env.SENDGRID_API_KEY) {
-      const res = await sendViaSendGrid(env.SENDGRID_API_KEY, { to, from, subject, text: textBody, html: htmlBody });
-      sent = res.ok; if (!res.ok) errMsg = await res.text().catch(()=> 'SendGrid error');
+      const sgPayload = {
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: from },
+        subject,
+        content: [
+          { type: 'text/plain', value: textBody },
+          { type: 'text/html', value: htmlBody }
+        ]
+      };
+      const sendgridResp = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(sgPayload)
+      });
+
+      // 新增：记录 SendGrid 返回的状态与 body（避免丢失信息）
+      let sgText = '';
+      try { sgText = await sendgridResp.text(); } catch (e) { sgText = '<read error>'; }
+      console.log('SENDGRID_FETCH', {
+        status: sendgridResp.status,
+        ok: sendgridResp.ok,
+        body: sgText
+      });
+
+      sent = sendgridResp.ok; if (!sendgridResp.ok) errMsg = sgText;
     } else if (env.RESEND_API_KEY) {
       const res = await sendViaResend(env.RESEND_API_KEY, { to, from, subject, text: textBody, html: htmlBody });
       sent = res.ok; if (!res.ok) errMsg = await res.text().catch(()=> 'Resend error');
