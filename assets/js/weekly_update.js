@@ -69,11 +69,20 @@ let currentRenderer = RENDERERS.find(r => r.default) || RENDERERS[0];
 let currentFile = null;
 let availableFiles = [];
 
-// 生成日期列表（最近60天）
+// 生成日期列表（过去60天 + 未来7天，覆盖可能的时区差异和预发布内容）
 function generateDateList() {
   const dates = [];
   const today = new Date();
   
+  // 添加未来7天（用于预发布内容或时区差异）
+  for (let i = 7; i >= 1; i--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0]; // yyyy-mm-dd格式
+    dates.push(dateStr);
+  }
+  
+  // 添加今天和过去60天
   for (let i = 0; i < 60; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
