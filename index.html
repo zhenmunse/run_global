@@ -4,17 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>永不失联 - 润物有声</title>
+  <script>
+    // Immediate theme application to prevent flash
+    (function() {
+      const savedTheme = sessionStorage.getItem('theme');
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const themeToApply = (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : systemTheme;
+      document.documentElement.setAttribute('data-theme', themeToApply);
+    })();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/common.css">
   <style>
     .notice {
-      background: rgba(255,193,7,0.1);
-      border: 1px solid rgba(255,193,7,0.3);
+      background: rgba(255, 217, 102, 0.532);
+      border: 1px solid rgba(255,193,7,0.4);
       border-radius: var(--radius);
       padding: 16px;
       margin-bottom: 24px;
       text-align: center;
       color: #ffc107;
+      backdrop-filter: blur(10px);
+    }
+    
+    [data-theme="light"] .notice {
+      background: rgba(251,191,36,0.35);
+      border-color: rgba(251,191,36,0.7);
+      color: #d97706;
     }
     .groups {
       display: grid;
@@ -36,7 +52,7 @@
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 12px;
-      color: #e6eef8;
+      color: var(--text-primary);
     }
     .group-info {
       display: flex;
@@ -116,6 +132,7 @@
       <nav class="nav">
         <a href="/" class="nav-item active">主页</a>
         <a href="/weekly_update/" class="nav-item">润学周报</a>
+        <a href="/studywire/" class="nav-item">留学前线</a>
         <a href="/about/" class="nav-item">关于</a>
       </nav>
     </div>
@@ -140,6 +157,7 @@
   </div>
 
   <script src="/assets/js/home.js" defer></script>
+  <script src="/assets/js/theme-switcher.js" defer></script>
 </body>
 <footer>
   <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>

@@ -1,7 +1,7 @@
 /* Common styles for run_global site (banner, layout, typography, cards, nav)
    Keep only page-specific styles inside each page. */
 
-/* CSS variables and theme */
+/* CSS variables and theme - Dark theme (default) */
 :root {
   --bg: #0f1724;
   --card: #0b1220;
@@ -10,6 +10,58 @@
   --glass: rgba(255,255,255,0.04);
   --border: rgba(255,255,255,0.1);
   --radius: 12px;
+  --text-primary: #e6eef8;
+  --text-secondary: rgba(255,255,255,0.65);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --card: #ffffff;
+  --accent: #3b82f6;
+  --muted: rgba(15,23,36,0.7);
+  --glass: rgba(15,23,36,0.04);
+  --border: rgba(15,23,36,0.1);
+  --text-primary: #1e293b;
+  --text-secondary: rgba(15,23,36,0.7);
+}
+
+/* Theme transition - faster transitions to reduce flashing */
+*, *::before, *::after {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, var(--accent), #7dd3fc);
+  border: none;
+  border-radius: 12px 0 0 12px;
+  padding: 12px 8px 12px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ffffff;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-50%) translateX(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: linear-gradient(135deg, var(--accent), #1d4ed8);
+  color: #ffffff;
 }
 
 /* Reset-ish */
@@ -18,14 +70,18 @@ html, body { height: 100%; }
 body {
   font-family: 'Source Han Sans CN', 'Noto Sans SC', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
                'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'EmojiOne Color', 'Android Emoji', sans-serif;
-  background: radial-gradient(1200px 600px at 10% 10%, rgba(110,168,254,0.08), transparent),
-              linear-gradient(180deg, var(--bg), #071224 60%);
-  color: #e6eef8;
+  background: var(--bg);
+  color: var(--text-primary);
   line-height: 1.6;
   margin: 0;
   padding: 40px 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Light theme specific background */
+[data-theme="light"] body {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
 }
 
 /* Layout wrappers */
@@ -36,33 +92,73 @@ body {
 /* Top banner and nav */
 .banner {
   position: fixed; top: 0; left: 0; right: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(135deg, var(--glass), rgba(255,255,255,0.01));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
   padding: 10px 20px; z-index: 100;
 }
 .brand { display: flex; align-items: center; justify-content: space-between; }
-.brand-text { font-weight: 600; color: #e6eef8; }
+.brand-text { font-weight: 600; color: var(--text-primary); }
 .nav { display: flex; gap: 8px; align-items: center; }
 .nav-item {
   padding: 8px 16px; border-radius: 10px; text-decoration: none;
   color: var(--muted); font-weight: 500; font-size: 14px;
   transition: all 0.2s ease; border: 1px solid transparent;
 }
-.nav-item:hover { background: rgba(255,255,255,0.05); color: #e6eef8; }
-.nav-item.active { background: linear-gradient(90deg, var(--accent), #7dd3fc); color: #04263b; font-weight: 600; }
+.nav-item:hover { background: var(--glass); color: var(--text-primary); }
+.nav-item.active { background: linear-gradient(90deg, var(--accent), #7dd3fc); color: #ffffff; font-weight: 600; }
+
+/* Light theme navigation adjustments */
+[data-theme="light"] .nav-item.active {
+  background: linear-gradient(90deg, #1d4ed8, #0ea5e9);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
+}
 
 /* Cards and hero */
 .card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  background: var(--card);
   padding: 28px; border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.03);
-  box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.3);
+}
+
+[data-theme="light"] .card {
+  box-shadow: 0 10px 30px rgba(15,23,36,0.1);
 }
 .hero { text-align: center; padding: 40px 20px; }
 .hero h2 {
   font-size: 32px; margin: 0 0 16px 0;
   background: linear-gradient(135deg, var(--accent), #7dd3fc);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  background-clip: text;
+  color: transparent; /* Fallback for when background-clip is supported */
+}
+
+/* Fallback for browsers that don't support background-clip */
+@supports not (-webkit-background-clip: text) {
+  .hero h2 {
+    background: none;
+    color: var(--accent);
+    -webkit-text-fill-color: initial;
+  }
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .hero h2 {
+  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Light theme fallback */
+[data-theme="light"] .hero h2:not([style*="background-clip"]) {
+  background: none;
+  color: #1d4ed8;
+  -webkit-text-fill-color: initial;
 }
 .hero p { font-size: 16px; color: var(--muted); margin: 0; }
 
@@ -80,4 +176,16 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 4
   .brand { flex-direction: column; gap: 8px; }
   .nav { justify-content: center; flex-wrap: wrap; }
   .container { padding: 100px 16px 20px; }
+  
+  .theme-toggle {
+    top: auto;
+    bottom: 20px;
+    right: 0;
+    transform: none;
+    border-radius: 12px 0 0 12px;
+  }
+  
+  .theme-toggle:hover {
+    transform: translateX(-4px);
+  }
 }

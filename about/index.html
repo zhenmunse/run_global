@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>关于我们 - 润物有声</title>
+  <script>
+    // Immediate theme application to prevent flash
+    (function() {
+      const savedTheme = sessionStorage.getItem('theme');
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const themeToApply = (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : systemTheme;
+      document.documentElement.setAttribute('data-theme', themeToApply);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -109,6 +118,7 @@
         <nav class="nav">
           <a href="/" class="nav-item">主页</a>
           <a href="/weekly_update/" class="nav-item">润学周报</a>
+          <a href="/studywire/" class="nav-item">留学前线</a>
           <a href="/about/" class="nav-item active">关于</a>
         </nav>
       </div>
@@ -218,5 +228,6 @@
   <!-- 仅保留一次脚本引入（自动渲染 Turnstile + 表单逻辑） -->
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script src="/assets/js/contact.js" defer></script>
+  <script src="/assets/js/theme-switcher.js" defer></script>
 </body>
 </html>
