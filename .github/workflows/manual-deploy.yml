@@ -18,11 +18,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-production
-  cancel-in-progress: false
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     environment:
       name: github-pages
       url: https://home.vineshore.org
@@ -33,16 +33,19 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
           
-      - name: Setup Node
+      - name: Setup Node (only for vue-test branch)
+        if: github.event.inputs.branch == 'vue-test'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Install dependencies (only for vue-test branch)
+        if: github.event.inputs.branch == 'vue-test'
         run: npm ci
         
-      - name: Build for production
+      - name: Build for production (only for vue-test branch)
+        if: github.event.inputs.branch == 'vue-test'
         run: npm run build
         env:
           VITE_BASE: '/'
@@ -50,10 +53,17 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Upload artifact
+      - name: Upload artifact (vue-test branch)
+        if: github.event.inputs.branch == 'vue-test'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
+          
+      - name: Upload artifact (main branch - static files)
+        if: github.event.inputs.branch == 'main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
           
       - name: Deploy to GitHub Pages
         id: deployment

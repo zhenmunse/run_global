@@ -5,7 +5,7 @@ import { resolve } from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
-  base: process.env.VITE_BASE || '/run_global/vue-test/',
+  base: process.env.VITE_BASE || '/',
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')

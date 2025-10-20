@@ -11,11 +11,14 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-vue-test
+  group: pages
   cancel-in-progress: false
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: https://home.vineshore.org
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
