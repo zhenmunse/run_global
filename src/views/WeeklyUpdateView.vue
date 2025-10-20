@@ -26,7 +26,7 @@
           <div class="current-issue-header">
             <h3 id="currentIssueTitle">📰 {{ currentFileDisplay }}</h3>
             <div class="issue-actions">
-              <a :href="rawLink" target="_blank" class="view-btn secondary">📄 查看源码</a>
+              <button @click="viewSource" class="view-btn secondary">📄 查看源码</button>
             </div>
           </div>
           <div class="issue-frame-container">
@@ -116,13 +116,37 @@ const currentFileDisplay = computed(() => {
   return file ? file.display : '润学周报';
 });
 
-const rawLink = computed(() => {
-  if (!currentFile.value) return '#';
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
-    return `/weekly_update/storage/${currentFile.value}`;
+async function viewSource() {
+  if (!currentFile.value) return;
+  
+  try {
+    const response = await fetch(`/weekly_update/storage/${currentFile.value}`);
+    const text = await response.text();
+    
+    // Create a blob with UTF-8 encoding
+    const blob = new Blob([text], { type: 'text/markdown; charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    // Open in new tab
+    const newWindow = window.open(url, '_blank');
+    if (newWindow) {
+      // Set title after load
+      setTimeout(() => {
+        try {
+          newWindow.document.title = `源码 - ${currentFile.value}`;
+        } catch (e) {
+          // Ignore cross-origin errors
+        }
+      }, 100);
+    }
+    
+    // Clean up the URL after a delay
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch (err) {
+    console.error('Failed to load source:', err);
+    alert('加载源码失败，请稍后再试');
   }
-  return `https://raw.githubusercontent.com/zhenmunse/run_global/main/weekly_update/storage/${currentFile.value}`;
-});
+}
 
 function generateDateList() {
   const dates = [];
@@ -287,11 +311,12 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   border:1px solid var(--border);
   border-radius:10px;
   padding:20px;
-  transition:transform 0.2s ease, background 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .issue:hover{
-  transform:translateY(-2px);
+  transform:translateY(-4px);
   background:var(--card);
+  box-shadow:0 6px 16px rgba(110,168,254,0.15);
 }
 .issue-header{
   display:flex;
@@ -324,10 +349,11 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   text-decoration:none;
   font-weight:600;
   font-size:14px;
-  transition:transform 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .issue-link:hover{
-  transform:translateY(-1px);
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(110,168,254,0.3);
 }
 
 .control-panel{
@@ -360,12 +386,13 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   font-size:14px;
   font-weight:500;
   min-width:200px;
-  transition:all 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .issue-select:focus{
   outline:none;
   border-color:var(--accent);
   background:var(--glass);
+  box-shadow:0 0 0 3px rgba(110,168,254,0.1);
 }
 .issue-select option{
   background:var(--card);
@@ -386,13 +413,15 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   cursor:pointer;
   font-size:14px;
   font-weight:500;
-  transition:all 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space:nowrap;
 }
 .refresh-btn:hover{
-  background:rgba(255,255,255,0.05);
+  background:rgba(255,255,255,0.08);
   border-color:var(--accent);
   color:#e6eef8;
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(110,168,254,0.2);
 }
 
 .news-item{
@@ -400,12 +429,13 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   border:1px solid rgba(255,255,255,0.04);
   border-radius:10px;
   padding:20px;
-  transition:all 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .news-item:hover{
-  transform:translateY(-2px);
-  background:rgba(255,255,255,0.03);
-  border-color:rgba(110,168,254,0.3);
+  transform:translateY(-4px);
+  background:rgba(255,255,255,0.04);
+  border-color:rgba(110,168,254,0.4);
+  box-shadow:0 6px 16px rgba(110,168,254,0.15);
 }
 .news-item-header{
   display:flex;
@@ -428,7 +458,7 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   text-decoration:none;
   font-size:12px;
   font-weight:600;
-  transition:all 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .btn-view{
   background:linear-gradient(90deg,var(--accent),#7dd3fc);
@@ -440,7 +470,8 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   border:1px solid rgba(255,255,255,0.1);
 }
 .news-item-btn:hover{
-  transform:translateY(-1px);
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(110,168,254,0.25);
 }
 .news-item-preview{
   color:var(--muted);
@@ -484,7 +515,7 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   text-decoration:none;
   font-size:12px;
   font-weight:600;
-  transition:all 0.2s ease;
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display:inline-flex;
   align-items:center;
   gap:4px;
@@ -495,7 +526,8 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   border:1px solid rgba(255,255,255,0.1);
 }
 .view-btn:hover{
-  transform:translateY(-1px);
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(110,168,254,0.25);
 }
 
 .issue-frame-container{
@@ -511,6 +543,34 @@ main{ display:grid; gap:24px; margin-bottom:28px; background:transparent; paddin
   color:var(--muted);
   background:transparent;
 }
+
+/* Markdown link styles */
+.issue-content a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.issue-content a:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
+.issue-content a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.issue-content a:visited {
+  color: var(--accent);
+}
+
+[data-theme="light"] .issue-content a,
+[data-theme="light"] .issue-content a:visited {
+  color: #1d4ed8;
+}
+
 .loading-indicator{
   position:absolute;
   top:0;

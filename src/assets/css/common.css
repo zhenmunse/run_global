@@ -26,12 +26,14 @@
   --text-secondary: rgba(15,23,36,0.7);
 }
 
-/* Theme transition - faster transitions to reduce flashing */
+/* 主题切换过渡 - 优化过渡速度，减少闪烁 */
 *, *::before, *::after {
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Theme toggle button */
+/* 主题切换按钮 */
 .theme-toggle {
   position: fixed;
   top: 50%;
@@ -46,7 +48,7 @@
   color: #ffffff;
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 44px;
   min-height: 44px;
   display: flex;
@@ -55,8 +57,8 @@
 }
 
 .theme-toggle:hover {
-  transform: translateY(-50%) translateX(-4px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-50%) translateX(-6px);
+  box-shadow: 0 6px 24px rgba(110, 168, 254, 0.4);
 }
 
 [data-theme="light"] .theme-toggle {
@@ -103,16 +105,27 @@ body {
 .nav-item {
   padding: 8px 16px; border-radius: 10px; text-decoration: none;
   color: var(--muted); font-weight: 500; font-size: 14px;
-  transition: all 0.2s ease; border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  border: 1px solid transparent;
 }
-.nav-item:hover { background: var(--glass); color: var(--text-primary); }
-.nav-item.active { background: linear-gradient(90deg, var(--accent), #7dd3fc); color: #ffffff; font-weight: 600; }
+.nav-item:hover { 
+  background: var(--glass); 
+  color: var(--text-primary); 
+  transform: translateY(-1px);
+}
+/* 当前激活页面的导航项样式 - 强烈高亮 */
+.nav-item.active { 
+  background: linear-gradient(90deg, var(--accent), #7dd3fc); 
+  color: #ffffff; 
+  font-weight: 600; 
+  box-shadow: 0 2px 8px rgba(110, 168, 254, 0.3);
+}
 
-/* Light theme navigation adjustments */
+/* 亮色主题导航高亮样式 */
 [data-theme="light"] .nav-item.active {
   background: linear-gradient(90deg, #1d4ed8, #0ea5e9);
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
+  box-shadow: 0 2px 12px rgba(29, 78, 216, 0.35);
 }
 
 /* Cards and hero */
@@ -145,19 +158,19 @@ body {
   }
 }
 
-/* Light theme adjustments */
+/* 亮色主题标题调整 - 使用深色系渐变 */
 [data-theme="light"] .hero h2 {
-  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  background: linear-gradient(135deg, #1a365d, #2d5a8f);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
 }
 
-/* Light theme fallback */
+/* 亮色主题降级方案 */
 [data-theme="light"] .hero h2:not([style*="background-clip"]) {
   background: none;
-  color: #1d4ed8;
+  color: #1a365d;
   -webkit-text-fill-color: initial;
 }
 .hero p { font-size: 16px; color: var(--muted); margin: 0; }
@@ -186,6 +199,7 @@ footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 4
   }
   
   .theme-toggle:hover {
-    transform: translateX(-4px);
+    transform: translateX(-6px);
+    box-shadow: 0 6px 24px rgba(110, 168, 254, 0.4);
   }
 }
