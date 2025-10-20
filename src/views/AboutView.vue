@@ -90,10 +90,6 @@
         <router-link to="/" class="link-btn" style="margin-top:16px">返回主页 →</router-link>
       </div>
     </main>
-
-    <footer>
-      <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
-    </footer>
   </div>
 </template>
 
@@ -229,8 +225,18 @@ onUnmounted(() => {
 .content h3{
   font-size:20px;
   margin:0 0 16px 0;
+}
+
+/* 深色主题 */
+[data-theme="dark"] .content h3 {
   color:#e6eef8;
 }
+
+/* 浅色主题 */
+[data-theme="light"] .content h3 {
+  color:#1a365d;
+}
+
 .content p{
   color:var(--muted);
   line-height:1.7;
@@ -296,11 +302,34 @@ onUnmounted(() => {
 .contact-form{ margin-top:10px }
 .contact-form .form-row{ display:flex;flex-direction:column;gap:6px;margin-bottom:12px }
 .contact-form label{ font-size:13px;color:#b9c6d3 }
-.contact-form input,.contact-form textarea{
+
+/* 表单输入框 - 深色主题 */
+[data-theme="dark"] .contact-form input,
+[data-theme="dark"] .contact-form textarea{
   background:rgba(255,255,255,0.02);
   border:1px solid rgba(255,255,255,0.08);
-  color:#e6eef8; border-radius:8px; padding:10px 12px; outline:none;
+  color:#e6eef8;
+  border-radius:8px;
+  padding:10px 12px;
+  outline:none;
 }
+
+/* 表单输入框 - 浅色主题 */
+[data-theme="light"] .contact-form input,
+[data-theme="light"] .contact-form textarea{
+  background:rgba(255,255,255,0.8);
+  border:1px solid rgba(0,0,0,0.15);
+  color:#1a365d;
+  border-radius:8px;
+  padding:10px 12px;
+  outline:none;
+}
+
+[data-theme="light"] .contact-form input::placeholder,
+[data-theme="light"] .contact-form textarea::placeholder{
+  color:#64748b;
+}
+
 .contact-form input:focus,.contact-form textarea:focus{ border-color: var(--accent) }
 .contact-form .form-actions{ display:flex;align-items:center;gap:12px;margin-top:8px }
 #cf-submit{

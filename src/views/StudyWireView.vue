@@ -47,10 +47,6 @@
         </div>
       </div>
     </main>
-
-    <footer>
-      <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
-    </footer>
   </div>
 </template>
 
