@@ -66,7 +66,17 @@
           <p class="feature-description">
             友善密集的交流空间，分享经验互相帮助
           </p>
-          <router-link to="/about" class="feature-link">了解社群 →</router-link>
+          <router-link to="/track" class="feature-link">了解社群 →</router-link>
+        </div>
+
+        <!-- 赞助与服务 -->
+        <div class="feature-card">
+          <div class="feature-icon">💙</div>
+          <h3 class="feature-title">赞助与服务</h3>
+          <p class="feature-description">
+            支持社区长期发展，查看鸣谢与付费服务
+          </p>
+          <router-link to="/support" class="feature-link">前往支持 →</router-link>
         </div>
       </div>
     </section>
@@ -383,7 +393,7 @@ onUnmounted(() => {
 }
 
 .hero-content {
-  max-width: 900px;
+  max-width: min(90%, 1600px); /* 响应式宽度：页面 90% 或最大 1600px */
   margin: 0 auto;
 }
 
@@ -405,7 +415,7 @@ onUnmounted(() => {
 
 .hero-description {
   text-align: left;
-  max-width: 800px;
+  max-width: min(90%, 1400px); /* 响应式宽度：页面 90% 或最大 1400px */
   margin: 0 auto;
 }
 

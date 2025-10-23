@@ -10,6 +10,7 @@
           <router-link to="/track" class="nav-item">永不失联</router-link>
           <router-link to="/weekly_update" class="nav-item">润学周报</router-link>
           <router-link to="/studywire" class="nav-item">留学前线</router-link>
+          <router-link to="/support" class="nav-item">赞助与服务</router-link>
           <router-link to="/contact" class="nav-item">联系我们</router-link>
         </nav>
       </div>

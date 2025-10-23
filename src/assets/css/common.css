@@ -16,7 +16,7 @@
 
 /* Light theme */
 [data-theme="light"] {
-  --bg: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  --bg: #f1f5f9;
   --card: #ffffff;
   --accent: #3b82f6;
   --muted: rgba(15,23,36,0.7);
@@ -83,11 +83,21 @@ body {
 
 /* Light theme specific background */
 [data-theme="light"] body {
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: #f1f5f9;
 }
 
 /* Layout wrappers */
-.wrap, .container { max-width: 940px; margin: 0 auto; }
+/* 更友好的宽屏布局：按照分辨率分档，内容上限为屏幕宽度的 50%，且不低于历史标准 940px；
+   兼容至 4K/2160p（3840/4096 宽度均表现为 ~50% 宽） */
+.wrap, .container { 
+  /* 在大部分分辨率下，容器最大宽度 = clamp(940px, 50vw, 2048px)
+     - 下限 940px：不低于之前的固定标准
+     - 优选 50vw：最多占整个屏幕宽度的 50%
+     - 上限 2048px：在 4096 宽的屏幕上取 50% 即 2048px
+   */
+  max-width: clamp(940px, 50vw, 2048px);
+  margin: 0 auto; 
+}
 .wrap { padding-top: 72px; }
 .container { padding: 72px 20px 20px; }
 

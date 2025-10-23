@@ -1,0 +1,16 @@
+[
+  {
+    "name": "匿名A",
+    "type": "sponsor",
+    "note": "服务器赞助"
+  },
+  {
+    "name": "匿名B",
+    "type": "sponsor"
+  },
+  {
+    "name": "匿名C",
+    "type": "contrib",
+    "note": "文档修订"
+  }
+]

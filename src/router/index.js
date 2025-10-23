@@ -32,6 +32,11 @@ const router = createRouter({
       name: 'weekly_update',
       component: () => import('../views/WeeklyUpdateView.vue') // 润学周报：每周精选资讯
     }
+    ,{
+      path: '/support',
+      name: 'support',
+      component: () => import('../views/SupportView.vue') // 赞助与服务：赞助、鸣谢与付费服务
+    }
   ]
 })
 
