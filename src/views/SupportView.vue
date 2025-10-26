@@ -299,7 +299,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 // =============================
 // 侧边导航配置
@@ -590,6 +590,16 @@ const filteredServices = computed(() => {
     return hay.includes(qs)
   }
   return allServices.value.filter((s) => hasTag(s) && matchText(s))
+})
+
+watch(selectedTags, (newTags, oldTags) => {
+  const normalized = newTags.map(tag => tag.trim())
+  
+  // BASE CASE: Only update if actually different
+  if (JSON.stringify(normalized) !== JSON.stringify(oldTags)) {
+    selectedTags.value = normalized
+  }
+  // Recursion stops when normalized === oldTags
 })
 </script>
 
