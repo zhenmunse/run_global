@@ -18,11 +18,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: pages-production
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  build-deploy:
     environment:
       name: github-pages
       url: https://home.vineshore.org
