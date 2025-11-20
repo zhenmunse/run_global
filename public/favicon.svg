@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="globeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="planeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 地球背景 -->
+  <circle cx="50" cy="50" r="45" fill="url(#globeGradient)"/>
+  
+  <!-- 地球经纬线 -->
+  <circle cx="50" cy="50" r="35" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <ellipse cx="50" cy="50" rx="35" ry="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <ellipse cx="50" cy="50" rx="20" ry="35" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <line x1="15" y1="50" x2="85" y2="50" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  
+  <!-- 飞机图标 -->
+  <g transform="translate(60, 25) rotate(45)">
+    <path d="M 0,-8 L -2,-6 L -6,-4 L -6,0 L -3,2 L -4,6 L -2,6 L 0,3 L 2,6 L 4,6 L 3,2 L 6,0 L 6,-4 L 2,-6 Z" 
+          fill="url(#planeGradient)" 
+          stroke="white" 
+          stroke-width="0.5"/>
+  </g>
+  
+  <!-- 飞行轨迹线 -->
+  <path d="M 20,70 Q 35,45 50,50 T 75,30" 
+        fill="none" 
+        stroke="rgba(255,255,255,0.5)" 
+        stroke-width="2" 
+        stroke-dasharray="4,4"
+        stroke-linecap="round"/>
+</svg>

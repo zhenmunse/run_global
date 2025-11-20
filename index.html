@@ -1,165 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>永不失联 - 润物有声</title>
-  <script>
-    // Immediate theme application to prevent flash
-    (function() {
-      const savedTheme = sessionStorage.getItem('theme');
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      const themeToApply = (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : systemTheme;
-      document.documentElement.setAttribute('data-theme', themeToApply);
-    })();
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/css/common.css">
-  <style>
-    .notice {
-      background: rgba(255, 217, 102, 0.532);
-      border: 1px solid rgba(255,193,7,0.4);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 24px;
-      text-align: center;
-      color: #ffc107;
-      backdrop-filter: blur(10px);
-    }
-    
-    [data-theme="light"] .notice {
-      background: rgba(251,191,36,0.35);
-      border-color: rgba(251,191,36,0.7);
-      color: #d97706;
-    }
-    .groups {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    .group-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      transition: all 0.2s ease;
-    }
-    .group-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-    }
-    .group-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--text-primary);
-    }
-    .group-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .qq-number {
-      font-family: inherit;
-      font-size: 16px;
-      color: var(--accent);
-      font-weight: 600;
-    }
-    .member-count {
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .group-actions {
-      display: flex;
-      gap: 8px;
-    }
-    .join-btn, .copy-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 14px;
-    }
-    .join-btn {
-      background: linear-gradient(135deg, var(--accent), #7dd3fc);
-      color: #04263b;
-    }
-    .copy-btn {
-      background: rgba(255,255,255,0.08);
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-    .join-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(110,168,254,0.3);
-    }
-    .copy-btn:hover {
-      background: rgba(255,255,255,0.12);
-      color: #e6eef8;
-    }
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: #e6eef8;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-    @media (max-width: 768px) {
-      .groups { grid-template-columns: 1fr; }
-      .group-actions { flex-direction: column; }
-    }
-  </style>
-</head>
-<body>
-  <div class="banner">
-    <div class="brand">
-      <div class="brand-text">润物有声</div>
-      <nav class="nav">
-        <a href="/" class="nav-item active">主页</a>
-        <a href="/weekly_update/" class="nav-item">润学周报</a>
-        <a href="/studywire/" class="nav-item">留学前线</a>
-        <a href="/about/" class="nav-item">关于</a>
-      </nav>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="card hero">
-      <h2>QQ群链接库</h2>
-      <p>请收藏此页面，避免失联</p>
-    </div>
-    
-    <div class="notice">
-      <p>部分浏览器环境"加入"按钮可能无法正常工作，此时请复制群号手动加群！</p>
-    </div>
-
-    <div class="groups">
-      <!-- QQ群列表将在这里动态加载 -->
-    </div>
-
-    <!-- Toast 提示 -->
-    <div id="toast" class="toast"></div>
-  </div>
-
-  <script src="/assets/js/home.js" defer></script>
-  <script src="/assets/js/theme-switcher.js" defer></script>
-</body>
-<footer>
-  <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
-</footer>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>永不失联 - 润物有声</title>
+    <script>
+      // GitHub Pages SPA redirect handling
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+    <script>
+      // Immediate theme application to prevent flash
+      (function() {
+        const savedTheme = sessionStorage.getItem('theme');
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        const themeToApply = (savedTheme === 'dark' || savedTheme === 'light') ? savedTheme : systemTheme;
+        document.documentElement.setAttribute('data-theme', themeToApply);
+      })();
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+    <script src="/assets/js/theme-switcher.js" defer></script>
+  </body>
 </html>

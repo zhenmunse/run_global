@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#7dd3fc"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="480" height="480" rx="24" fill="#0b1622"/>
+  <rect x="40" y="40" width="400" height="400" rx="16" fill="#0f2133" stroke="url(#g)" stroke-width="3"/>
+  <g transform="translate(90,90)">
+    <rect x="0" y="0" width="300" height="300" fill="#0b1622" stroke="#1f3b5b" stroke-dasharray="6,6"/>
+    <g transform="translate(48,48)">
+      <rect x="0" y="0" width="204" height="204" fill="#0f2133"/>
+      <rect x="16" y="16" width="32" height="32" fill="#0b1622"/>
+      <rect x="56" y="16" width="32" height="32" fill="#0b1622"/>
+      <rect x="96" y="16" width="32" height="32" fill="#0b1622"/>
+      <rect x="136" y="16" width="32" height="32" fill="#0b1622"/>
+      <rect x="16" y="56" width="32" height="32" fill="#0b1622"/>
+      <rect x="56" y="56" width="32" height="32" fill="#3b82f6"/>
+      <rect x="96" y="56" width="32" height="32" fill="#0b1622"/>
+      <rect x="136" y="56" width="32" height="32" fill="#0b1622"/>
+      <rect x="16" y="96" width="32" height="32" fill="#0b1622"/>
+      <rect x="56" y="96" width="32" height="32" fill="#0b1622"/>
+      <rect x="96" y="96" width="32" height="32" fill="#7dd3fc"/>
+      <rect x="136" y="96" width="32" height="32" fill="#0b1622"/>
+      <rect x="16" y="136" width="32" height="32" fill="#0b1622"/>
+      <rect x="56" y="136" width="32" height="32" fill="#0b1622"/>
+      <rect x="96" y="136" width="32" height="32" fill="#0b1622"/>
+      <rect x="136" y="136" width="32" height="32" fill="#3b82f6"/>
+    </g>
+    <text x="150" y="270" text-anchor="middle" fill="#7dd3fc" font-size="16">微信支付占位图 · 请替换为实际收款码</text>
+  </g>
+  <g transform="translate(60,440)">
+    <circle cx="12" cy="-12" r="6" fill="url(#g)"/>
+    <text x="26" y="-8" fill="#9fb3c8" font-size="14">将 payment_code.jpg 放到 /public/assets/images/</text>
+  </g>
+</svg>
