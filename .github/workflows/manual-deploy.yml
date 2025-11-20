@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Select branch to deploy to production (home.vineshore.org)'
+        description: "Select branch to deploy to production"
         required: true
-        default: 'main'
+        default: "main"
         type: choice
         options:
           - main
@@ -18,53 +18,35 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-production
-  cancel-in-progress: false
+  group: manual-pages
+  cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     environment:
       name: github-pages
-      url: https://home.vineshore.org
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout selected branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
-          
-      - name: Setup Node (only for vue-test branch)
-        if: github.event.inputs.branch == 'vue-test'
-        uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-          
-      - name: Install dependencies (only for vue-test branch)
-        if: github.event.inputs.branch == 'vue-test'
-        run: npm ci
-        
-      - name: Build for production (only for vue-test branch)
-        if: github.event.inputs.branch == 'vue-test'
-        run: npm run build
+
+      - run: npm ci
+      - run: npm run build
         env:
-          VITE_BASE: '/'
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        
-      - name: Upload artifact (vue-test branch)
-        if: github.event.inputs.branch == 'vue-test'
-        uses: actions/upload-pages-artifact@v3
+          VITE_BASE: "/"
+
+      - uses: actions/configure-pages@v4
+
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-          
-      - name: Upload artifact (main branch - static files)
-        if: github.event.inputs.branch == 'main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-          
-      - name: Deploy to GitHub Pages
-        id: deployment
+
+      - id: deployment
         uses: actions/deploy-pages@v4
