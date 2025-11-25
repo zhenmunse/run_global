@@ -1,16 +1,12 @@
 [
   {
-    "name": "匿名A",
+    "name": "待认领赞助者",
     "type": "sponsor",
-    "note": "服务器赞助"
+    "note": "网站赞助"
   },
   {
-    "name": "匿名B",
-    "type": "sponsor"
-  },
-  {
-    "name": "匿名C",
-    "type": "contrib",
-    "note": "文档修订"
+    "name": "Sivella",
+    "type": "sponsor",
+    "note": "网站赞助"
   }
 ]
