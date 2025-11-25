@@ -40,7 +40,8 @@ const groups = ref([
   { name: "日语交流群", qq: "1064090273" },
   { name: "美国/加拿大交流群", qq: "769931954" },
   { name: "澳洲/新西兰交流群", qq: "1061445992" },
-  { name: "德语交流群", qq: "857225570" }
+  { name: "德语交流群", qq: "857225570" },
+  { name: "欧陆（除德国）交流群", qq: "912737516" }
 ]);
 
 const toast = ref({ show: false, message: '' });
@@ -104,110 +105,178 @@ function copyGroupNumber(qq) {
 
 <style scoped>
 .notice {
-  background: rgba(255, 217, 102, 0.532);
-  border: 1px solid rgba(255,193,7,0.4);
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.2);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 24px;
   text-align: center;
-  color: #ffc107;
+  color: #facc15;
   backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.notice::before {
+  content: '⚠️';
 }
 
 [data-theme="light"] .notice {
-  background: rgba(251,191,36,0.35);
-  border-color: rgba(251,191,36,0.7);
+  background: rgba(251,191,36,0.1);
+  border-color: rgba(251,191,36,0.3);
   color: #d97706;
 }
+
 .groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
+
 .group-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
-  transition: all 0.2s ease;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
+
+.group-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .group-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
 }
+
+.group-card:hover::before {
+  opacity: 1;
+}
+
 .group-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
   color: var(--text-primary);
+  letter-spacing: -0.01em;
 }
+
 .group-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 }
+
 .qq-number {
-  font-family: inherit;
-  font-size: 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 18px;
   color: var(--accent);
   font-weight: 600;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
 }
+
 .member-count {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+
 .group-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
+
 .join-btn, .copy-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
+
 .join-btn {
-  background: linear-gradient(135deg, var(--accent), #7dd3fc);
-  color: #04263b;
+  background: var(--accent-gradient);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
 }
+
 .copy-btn {
-  background: rgba(255,255,255,0.08);
-  color: var(--muted);
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
   border: 1px solid var(--border);
 }
+
 .join-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(110,168,254,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4);
 }
+
 .copy-btn:hover {
-  background: rgba(255,255,255,0.12);
-  color: #e6eef8;
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
+
 .toast {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--card);
+  bottom: 32px;
+  right: 32px;
+  background: rgba(15, 23, 42, 0.9);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 16px;
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 24px;
   color: #e6eef8;
-  transform: translateY(100px);
+  transform: translateY(100px) scale(0.9);
   opacity: 0;
-  transition: all 0.3s ease;
-  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2000;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(12px);
+  font-weight: 500;
 }
+
 .toast.show {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   opacity: 1;
 }
+
 @media (max-width: 768px) {
   .groups { grid-template-columns: 1fr; }
   .group-actions { flex-direction: column; }
+  .toast { 
+    left: 20px; 
+    right: 20px; 
+    bottom: 20px;
+    text-align: center;
+  }
 }
 </style>

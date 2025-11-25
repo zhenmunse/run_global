@@ -398,13 +398,32 @@ onUnmounted(() => {
 }
 
 .hero-title {
-  font-size: 56px;
-  font-weight: 700;
-  margin: 0 0 16px 0;
-  background: linear-gradient(90deg, var(--accent), #7dd3fc);
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 800;
+  margin: 0 0 24px 0;
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background: var(--accent);
+  filter: blur(60px);
+  opacity: 0.15;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .hero-subtitle {
@@ -498,18 +517,36 @@ onUnmounted(() => {
 
 /* 特色功能卡片 */
 .feature-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
   padding: 32px;
   text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: radial-gradient(circle at top right, var(--accent-glow), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(110, 168, 254, 0.2);
+  transform: translateY(-8px);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+.feature-card:hover::before {
+  opacity: 1;
 }
 
 .feature-icon {
@@ -639,21 +676,23 @@ onUnmounted(() => {
 
 /* 团队成员卡片 */
 .team-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 24px 32px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
+  gap: 32px;
+  position: relative;
 }
 
 .team-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.01);
   border-color: var(--accent);
-  box-shadow: 0 8px 20px rgba(110, 168, 254, 0.2);
+  box-shadow: var(--shadow-lg);
+  background: var(--surface);
 }
 
 .team-info {
@@ -750,9 +789,33 @@ onUnmounted(() => {
 .stat-card {
   text-align: center;
   padding: 32px;
-  background: linear-gradient(135deg, rgba(110, 168, 254, 0.1) 0%, rgba(125, 211, 252, 0.1) 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(110, 168, 254, 0.2);
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-gradient);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.stat-card:hover::after {
+  transform: scaleX(1);
 }
 
 .stat-number {

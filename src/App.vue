@@ -6,12 +6,12 @@
         <div class="brand-text">润物有声</div>
         <!-- 主导航菜单 -->
         <nav class="nav">
-          <router-link to="/" class="nav-item">主页</router-link>
-          <router-link to="/track" class="nav-item">永不失联</router-link>
-          <router-link to="/weekly_update" class="nav-item">润学周报</router-link>
-          <router-link to="/studywire" class="nav-item">留学前线</router-link>
-          <router-link to="/support" class="nav-item">赞助与服务</router-link>
-          <router-link to="/contact" class="nav-item">联系我们</router-link>
+          <router-link to="/" class="nav-item" active-class="active">主页</router-link>
+          <router-link to="/track" class="nav-item" active-class="active">永不失联</router-link>
+          <router-link to="/weekly_update" class="nav-item" active-class="active">润学周报</router-link>
+          <router-link to="/studywire" class="nav-item" active-class="active">留学前线</router-link>
+          <router-link to="/support" class="nav-item" active-class="active">赞助与服务</router-link>
+          <router-link to="/contact" class="nav-item" active-class="active">联系我们</router-link>
         </nav>
       </div>
     </div>
@@ -27,7 +27,9 @@
 
     <!-- 页脚 -->
     <footer>
-      <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
+      <div class="footer-content">
+        <p>&copy; 2025 润物有声项目 | 新生代海外华人互助社群</p>
+      </div>
     </footer>
   </div>
 </template>
