@@ -263,7 +263,7 @@ function copyGroupNumber(qq) {
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 2000;
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
   font-weight: 500;
 }
