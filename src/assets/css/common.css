@@ -269,14 +269,14 @@ body {
 }
 
 .page-title p {
-  color: var(--muted);
+  color: var(--text-secondary);
   margin: 8px 0 0 0;
 }
 
 /* Footer */
 footer {
   text-align: center;
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 13px;
   margin-top: 40px;
 }
